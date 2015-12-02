@@ -13,7 +13,7 @@ import android.view.Display;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-//This comment is a test
+
 public class LocalMultiplayer extends Activity {
     /*Holds logic of the local multiplayer - like a motherboard of computer
     Will also respond to screen touches
