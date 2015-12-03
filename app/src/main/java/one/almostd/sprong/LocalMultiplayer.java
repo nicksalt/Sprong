@@ -23,9 +23,11 @@ public class LocalMultiplayer extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //Init. localmultiplayerview and set it as the view
+        //Init localmultiplayerview and set it as the view
         localMultiplayerView = new LocalMultiplayerView(this);
         setContentView(localMultiplayerView);
+
+
     }
 
     // THis is a inner class - Implemnt runnable so we have A thread and can override the run method
@@ -240,15 +242,14 @@ public class LocalMultiplayer extends Activity {
         public void draw() {
 
             // Make sure our drawing surface is valid or we crash
+
             if (ourHolder.getSurface().isValid()) {
                 // Lock the canvas ready to draw
                 canvas = ourHolder.lockCanvas();
 
                 // Draw the background color
                 canvas.drawColor(Color.argb(255, 0, 0, 0));
-                //  float cx = (screenX - bitmapBackground.getWidth()) /2;
-                //float cy = (screenY - bitmapBackground.getHeight()) / 2;
-                //canvas.drawBitmap(bitmapBackground, cx, cy, null);
+
 
                 // Choose the brush color for drawing
                 paint.setColor(Color.argb(255, 0, 0, 255));
@@ -325,27 +326,18 @@ public class LocalMultiplayer extends Activity {
         // So we can override this method and detect screen touches.
         @Override
         public boolean onTouchEvent(MotionEvent motionEvent) {
-
-            switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
+            final int actionPeformed = motionEvent.getAction();
+            switch (actionPeformed & MotionEvent.ACTION_MASK) {
 
                 // Player has touched the screen
                 case MotionEvent.ACTION_DOWN:
+                    if (paddle1.getRect(1).left < motionEvent.getX() ){
 
-                    paused = false;
-                    if (motionEvent.getX() < screenX / 2 && motionEvent.getY() > screenY / 2) {
-                        paddle1.setMovementState(paddle1.LEFT);
-                    }
-
-                    if (motionEvent.getX() > screenX / 2 && motionEvent.getY() > screenY / 2) {
-                        paddle1.setMovementState(paddle1.RIGHT);
-                    }
-                    if (motionEvent.getX() > screenX / 2 && motionEvent.getY() < screenY / 2) {
-                        paddle2.setMovementState(paddle2.RIGHT);
-                    }
-                    if (motionEvent.getX() < screenX / 2 && motionEvent.getY() < screenY / 2){
-                        paddle2.setMovementState((paddle2.LEFT));
                     }
                     break;
+
+                case MotionEvent.ACTION_MOVE
+
 
                 // Player has removed finger from screen
                 case MotionEvent.ACTION_UP:
