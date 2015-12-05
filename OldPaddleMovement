@@ -25,6 +25,38 @@
 +                // Player has removed finger from screen
 +                case MotionEvent.ACTION_UP:
 +
+
+public void update(long fps, int screenX, int paddle) {
+
+        if (paddleMoving == LEFT) {
+            if (paddle == 1) {
+                x1 = x1 - paddleSpeed / fps;
+                if (x1 < -1) {
+                    paddleMoving = STOPPED;
+                }
+            }
+            if (paddle == 2) {
+                x2 = x2 - paddleSpeed / fps;
+                if (x2 < -1) {
+                    paddleMoving = STOPPED;
+                }
+            }
+        }
+
+        if (paddleMoving == RIGHT) {
+            if (paddle == 1) {
+                x1 = x1 + paddleSpeed / fps;
+                if (x1 + length > (screenX + 1)) {
+                    paddleMoving = STOPPED;
+                }
+            }
+            if (paddle == 2) {
+                x2 = x2 + paddleSpeed / fps;
+                if (x2 + length > (screenX + 1)) {
+                    paddleMoving = STOPPED;
+                }
+            }
+        }
 +                    paddle1.setMovementState(paddle1.STOPPED);
 +                    paddle2.setMovementState(paddle1.STOPPED);
 +                    break;
