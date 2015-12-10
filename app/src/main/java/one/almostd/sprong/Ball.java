@@ -19,7 +19,7 @@ public class Ball {
     public Ball(int screenX, int screenY){
 
         x = screenX / 2;
-        y = screenY - 20;
+        y = screenY - 25;
 
         // Start the ball travelling straight up at 100 pixels per second
         xVelocity = 200;

@@ -8,17 +8,22 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.support.v4.view.MotionEventCompat;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import java.io.IOException;
+
+
 public class LocalMultiplayer extends Activity {
     /*Holds logic of the local multiplayer - like a motherboard of computer
     Will also respond to screen touches
     */
     LocalMultiplayerView localMultiplayerView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,8 +32,8 @@ public class LocalMultiplayer extends Activity {
         localMultiplayerView = new LocalMultiplayerView(this);
         setContentView(localMultiplayerView);
 
-
     }
+
 
     // THis is a inner class - Implemnt runnable so we have A thread and can override the run method
     class LocalMultiplayerView extends SurfaceView implements Runnable {
@@ -38,7 +43,7 @@ public class LocalMultiplayer extends Activity {
         //Need this to use canvas and paint
         SurfaceHolder ourHolder;
 
-        //Booelan to set and unset when game is running
+        //Boolean to set and unset when game is running
         volatile boolean playing;
 
         //Game is paused at the start
@@ -47,7 +52,7 @@ public class LocalMultiplayer extends Activity {
         Canvas canvas;
         Paint paint;
 
-        //Tracks the game's framerate
+        //Tracks the game's frame rate
         long fps;
 
         //This is used to help caculate the fps
@@ -59,7 +64,6 @@ public class LocalMultiplayer extends Activity {
         // The players paddle
         Paddle paddle1;
         Paddle paddle2;
-
 
         // A ball
         Ball ball;
@@ -160,9 +164,9 @@ public class LocalMultiplayer extends Activity {
 
         public void update() {
 
-            // Move the paddle if required
-            paddle1.update(fps, screenX, 1);
-            paddle2.update(fps, screenX, 2);
+
+            paddle1.update(1, 0);
+            paddle2.update(2,0);
 
             ball.update(fps);
 
@@ -181,22 +185,22 @@ public class LocalMultiplayer extends Activity {
             }
 
             // Check for ball colliding with paddle
-            if (RectF.intersects(paddle1.getRect(1), ball.getRect())){
+            if (RectF.intersects(paddle1.getRect1(), ball.getRect())) {
                 ball.reverseYVelocity();
-                ball.clearObstacleY(screenY-30);
+                ball.clearObstacleY(screenY - 30);
             }
 
-            if (RectF.intersects(paddle2.getRect(2), ball.getRect())) {
+            if (RectF.intersects(paddle2.getRect2(), ball.getRect())) {
                 ball.reverseYVelocity();
                 ball.clearObstacleY(35);
             }
 
 
             // Bounce the ball back when it hits the bottom of screen
-            if (ball.getRect().bottom > (screenY) && !RectF.intersects(paddle1.getRect(1), ball.getRect())) {
+            if (ball.getRect().bottom > (screenY) &&
+                    !RectF.intersects(paddle1.getRect1(), ball.getRect())) {
                 ball.reverseYVelocity();
-                ball.clearObstacleY(screenY-2);
-
+                ball.clearObstacleY(screenY - 2);
 
 
                 // Lose a life
@@ -210,7 +214,7 @@ public class LocalMultiplayer extends Activity {
             }
 
             // Bounce the ball back when it hits the top of screen
-            if (ball.getRect().top < 0 && !RectF.intersects(ball.getRect(), paddle2.getRect(2)) ) {
+            if (ball.getRect().top < 0 && !RectF.intersects(ball.getRect(), paddle2.getRect2())) {
                 ball.clearObstacleY(12);//was 12 as 12/10 = 1.2 & 1.2*25 = 30
                 ball.reverseYVelocity();
                 lives--;
@@ -233,7 +237,7 @@ public class LocalMultiplayer extends Activity {
             // Pause if cleared screen
             if (score == numBricks * 10) {
                 paused = true;
-                localMultiplayerView.createBricksAndRestart();
+                createBricksAndRestart();
             }
 
         }
@@ -255,10 +259,10 @@ public class LocalMultiplayer extends Activity {
                 paint.setColor(Color.argb(255, 0, 0, 255));
 
                 // Draw the paddle
-                canvas.drawRect(paddle1.getRect(1), paint);
+                canvas.drawRect(paddle1.getRect1(), paint);
 
                 //Draw paddle 2
-                canvas.drawRect(paddle2.getRect(2), paint);
+                canvas.drawRect(paddle2.getRect2(), paint);
                 //            canvas.drawBitmap(bitmapBackground, 0, 100, paint);
 
                 paint.setColor(Color.argb(255, 255, 255, 255));
@@ -281,7 +285,7 @@ public class LocalMultiplayer extends Activity {
 
                 // Draw the score
                 paint.setTextSize(40);
-                canvas.drawText("Score: " + score + "   Lives: " + lives,  10, 50, paint);
+                canvas.drawText("Score: " + score + "   Lives: " + lives, 10, 50, paint);
 
                 // Has the player cleared the screen?
                 if (score == numBricks * 10) {
@@ -322,30 +326,51 @@ public class LocalMultiplayer extends Activity {
             gameThread.start();
         }
 
-        // The SurfaceView class implements onTouchListener
-        // So we can override this method and detect screen touches.
+
+        int initalX = 0;
+        int initalY =0;
         @Override
-        public boolean onTouchEvent(MotionEvent motionEvent) {
-            final int actionPeformed = motionEvent.getAction();
-            switch (actionPeformed & MotionEvent.ACTION_MASK) {
+        public boolean onTouchEvent(MotionEvent ev) {
+            final int x = (int) ev.getRawX();
+            final int y = (int) ev.getRawY();
+            int deltaX;
 
-                // Player has touched the screen
-                case MotionEvent.ACTION_DOWN:
-                    if (paddle1.getRect(1).left < motionEvent.getX() ){
 
+
+
+            final int action = MotionEventCompat.getActionMasked(ev);
+
+
+            switch (action) {
+                case MotionEvent.ACTION_DOWN: {
+                    initalX = x;
+                    initalY = y;
+
+                }
+                case MotionEvent.ACTION_MOVE: {
+
+                    if (initalY > screenY / 2) {
+                        deltaX = x - initalX;
+                        paddle1.update(1, deltaX);
                     }
-                    break;
+                    if (initalY <= screenY / 2) {
+                        deltaX = x - initalX;
+                        paddle2.update(2, deltaX);
+                    }
+                }
 
-                case MotionEvent.ACTION_MOVE
-
-
-                // Player has removed finger from screen
                 case MotionEvent.ACTION_UP:
-
-                    paddle1.setMovementState(paddle1.STOPPED);
-                    paddle2.setMovementState(paddle1.STOPPED);
                     break;
+                case MotionEvent.ACTION_POINTER_DOWN:
+                    break;
+                case MotionEvent.ACTION_POINTER_UP:
+                    break;
+
             }
+
+
+
+
             return true;
         }
     }
@@ -363,7 +388,6 @@ public class LocalMultiplayer extends Activity {
     // Movement, collision detection etc.
 
 
-
     // This method executes when the player quits the game
     @Override
     protected void onPause() {
@@ -373,6 +397,8 @@ public class LocalMultiplayer extends Activity {
         localMultiplayerView.pause();
     }
 }
+
+
 // This is the end of the BreakoutGame class
 
 // This is the end of the BreakoutGame class
