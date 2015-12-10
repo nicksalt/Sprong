@@ -19,7 +19,7 @@ public class Ball {
     public Ball(int screenX, int screenY){
 
         x = screenX / 2;
-        y = screenY - 25;
+        y = screenY - 20;
 
         // Start the ball travelling straight up at 100 pixels per second
         xVelocity = 200;
@@ -36,9 +36,9 @@ public class Ball {
         return rect;
     }
 
-    public void update(long fps){
-        rect.left = rect.left + (xVelocity / fps);
-        rect.top = rect.top + (yVelocity / fps);
+    public void update(/*long fps*/){
+        rect.left = rect.left + (xVelocity );
+        rect.top = rect.top + (yVelocity );
         rect.right = rect.left + ballWidth;
         rect.bottom = rect.top + ballHeight;
     }

@@ -38,13 +38,13 @@ public class Paddle {
     // When we create an object from this class we will pass
     // in the screen width and height
     public Paddle(int screenX, int screenY) {
-        length = 200;
-        height = 20;
+        length = 250;
+        height = 30;
 
         // Start paddle in roughly the sceen centre
-        x1 = screenX / 2;
-        y1 = screenY - 21;
-        x2 = screenX / 2;
+        x1 = (int)((screenX / 2) - (250/2));
+        y1 = screenY - 30;
+        x2 = x1;
         y2 = 0;
 
 
@@ -78,16 +78,30 @@ public class Paddle {
     // contained in rect if necessary
     
 
-    public void update (int paddle, float x){
+    public void update (int paddle, float x, int screenX){
         if (paddle==1){
-            x1 = x;
-            rect1.left = x1;
-            rect1.right = x1 + length;
+            rect1.left = rect1.left + x;
+            rect1.right = rect1.left + length;
+            if (rect1.left < 0 ){
+                rect1.left=0;
+                rect1.right = rect1.left + length;
+            }
+            if (rect1.right > screenX){
+                rect1.left = screenX - length;
+                rect1.right = screenX;
+            }
         }
         if (paddle==2){
-            x2=x;
-            rect2.left = x2;
-            rect2.right = x2 + length;
+            rect2.left = rect2.left + x;
+            rect2.right = rect2.left + length;
+            if (rect2.left < 0 ){
+                rect2.left=0;
+                rect2.right = rect2.left + length;
+            }
+            if (rect2.right > screenX){
+                rect2.left = screenX - length;
+                rect2.right = screenX;
+            }
         }
 
 

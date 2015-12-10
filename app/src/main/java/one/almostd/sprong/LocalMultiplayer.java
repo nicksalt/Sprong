@@ -1,5 +1,6 @@
 package one.almostd.sprong;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -14,6 +15,7 @@ import android.view.Display;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 
 import java.io.IOException;
 
@@ -71,7 +73,7 @@ public class LocalMultiplayer extends Activity {
         // Up to 200 bricks
         Brick[] bricks = new Brick[72];
         int numBricks = 0;
-
+        InitalX initalX;
         // The score
         int score = 0;
 
@@ -94,6 +96,14 @@ public class LocalMultiplayer extends Activity {
             // Load the resolution into a Point object
             Point size = new Point();
             display.getSize(size);
+
+            View decorView = getWindow().getDecorView();
+// Hide the status bar.
+            int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+            decorView.setSystemUiVisibility(uiOptions);
+// Remember that you should never show the action bar if the
+// status bar is hidden, so hide that too if necessary.
+
 
             screenX = size.x;
             screenY = size.y;
@@ -165,10 +175,10 @@ public class LocalMultiplayer extends Activity {
         public void update() {
 
 
-            paddle1.update(1, 0);
-            paddle2.update(2,0);
+            //paddle1.update(1, 0);
+            //paddle2.update(2,0);
 
-            ball.update(fps);
+            ball.update();
 
             // Check for ball colliding with a brick
             for (int i = 0; i < numBricks; i++) {
@@ -285,7 +295,7 @@ public class LocalMultiplayer extends Activity {
 
                 // Draw the score
                 paint.setTextSize(40);
-                canvas.drawText("Score: " + score + "   Lives: " + lives, 10, 50, paint);
+                canvas.drawText("Score: " + score + "   Lives: " + lives + "   fps: " + fps, 10, 50, paint);
 
                 // Has the player cleared the screen?
                 if (score == numBricks * 10) {
@@ -327,8 +337,7 @@ public class LocalMultiplayer extends Activity {
         }
 
 
-        int initalX = 0;
-        int initalY =0;
+
         @Override
         public boolean onTouchEvent(MotionEvent ev) {
             final int x = (int) ev.getRawX();
@@ -342,22 +351,22 @@ public class LocalMultiplayer extends Activity {
 
 
             switch (action) {
-                case MotionEvent.ACTION_DOWN: {
-                    initalX = x;
-                    initalY = y;
+                case MotionEvent.ACTION_DOWN:
+                    initalX = new InitalX((int)ev.getRawX());
 
-                }
-                case MotionEvent.ACTION_MOVE: {
 
-                    if (initalY > screenY / 2) {
-                        deltaX = x - initalX;
-                        paddle1.update(1, deltaX);
+                case MotionEvent.ACTION_MOVE:
+                    if (y > screenY / 2) {
+                        deltaX = x - initalX.getInitalX() ;
+
+                        paddle1.update(1, deltaX, screenX);
                     }
-                    if (initalY <= screenY / 2) {
-                        deltaX = x - initalX;
-                        paddle2.update(2, deltaX);
+                    if (y <= screenY / 2) {
+                        deltaX = x - initalX.getInitalX();
+                        paddle2.update(2, deltaX, screenX);
                     }
-                }
+                    initalX.resetX((int)ev.getRawX());
+
 
                 case MotionEvent.ACTION_UP:
                     break;
