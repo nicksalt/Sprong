@@ -14,7 +14,7 @@ public class Brick {
 
         isVisible = true;
 
-        int padding = 2;
+        int padding = 10;
 
         rect = new RectF(column * width + padding,
                 row * height + padding,

@@ -1,6 +1,6 @@
 package one.almostd.sprong;
 
-import android.app.ActionBar;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -13,11 +13,10 @@ import android.support.v4.view.MotionEventCompat;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-
-import java.io.IOException;
 
 
 public class LocalMultiplayer extends Activity {
@@ -26,6 +25,7 @@ public class LocalMultiplayer extends Activity {
     */
     LocalMultiplayerView localMultiplayerView;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,6 +33,7 @@ public class LocalMultiplayer extends Activity {
         //Init localmultiplayerview and set it as the view
         localMultiplayerView = new LocalMultiplayerView(this);
         setContentView(localMultiplayerView);
+
 
     }
 
@@ -63,6 +64,8 @@ public class LocalMultiplayer extends Activity {
         public int screenX;
         public int screenY;
 
+        private float mLastTouchX;
+
         // The players paddle
         Paddle paddle1;
         Paddle paddle2;
@@ -73,7 +76,6 @@ public class LocalMultiplayer extends Activity {
         // Up to 200 bricks
         Brick[] bricks = new Brick[72];
         int numBricks = 0;
-        InitalX initalX;
         // The score
         int score = 0;
 
@@ -97,12 +99,7 @@ public class LocalMultiplayer extends Activity {
             Point size = new Point();
             display.getSize(size);
 
-            View decorView = getWindow().getDecorView();
-// Hide the status bar.
-            int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-            decorView.setSystemUiVisibility(uiOptions);
-// Remember that you should never show the action bar if the
-// status bar is hidden, so hide that too if necessary.
+
 
 
             screenX = size.x;
@@ -125,12 +122,12 @@ public class LocalMultiplayer extends Activity {
             ball.reset(screenX, screenY);
 
             int brickWidth = screenX / 10;
-            int brickHeight = screenY / 30;
+            int brickHeight = screenY / 28;
 
             // Build a wall of bricks
             numBricks = 0;
             for (int column = 2; column < 8; column++) {
-                for (int row = 9; row < 21; row++) {
+                for (int row = 8; row < 20; row++) {
                     bricks[numBricks] = new Brick(row, column, brickWidth, brickHeight);
                     numBricks++;
                 }
@@ -175,8 +172,6 @@ public class LocalMultiplayer extends Activity {
         public void update() {
 
 
-            //paddle1.update(1, 0);
-            //paddle2.update(2,0);
 
             ball.update();
 
@@ -261,9 +256,7 @@ public class LocalMultiplayer extends Activity {
                 // Lock the canvas ready to draw
                 canvas = ourHolder.lockCanvas();
 
-                // Draw the background color
-                canvas.drawColor(Color.argb(255, 0, 0, 0));
-
+                canvas.drawColor(Color.BLACK);
 
                 // Choose the brush color for drawing
                 paint.setColor(Color.argb(255, 0, 0, 255));
@@ -279,6 +272,9 @@ public class LocalMultiplayer extends Activity {
 
                 // Draw the ball
                 canvas.drawRect(ball.getRect(), paint);
+                //draw lines for touch area
+                canvas.drawLine(0, (float) (screenY - (screenY / 24)), screenX, ((float) (screenY - (screenY / 24))), paint);
+                canvas.drawLine(0, (float) (screenY / 24), screenX, (float) (screenY / 24), paint);
 
                 // Change the brush color for drawing
                 paint.setColor(Color.argb(255, 255, 0, 0));
@@ -293,9 +289,7 @@ public class LocalMultiplayer extends Activity {
                 // Choose the brush color for drawing
                 paint.setColor(Color.argb(255, 255, 255, 255));
 
-                // Draw the score
-                paint.setTextSize(40);
-                canvas.drawText("Score: " + score + "   Lives: " + lives + "   fps: " + fps, 10, 50, paint);
+
 
                 // Has the player cleared the screen?
                 if (score == numBricks * 10) {
@@ -331,50 +325,78 @@ public class LocalMultiplayer extends Activity {
         // If SimpleGameEngine Activity is started theb
         // start our thread.
         public void resume() {
+            View decorView = getWindow().getDecorView();
+            // Hide the status bar.
+            int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+            decorView.setSystemUiVisibility(uiOptions);
             playing = true;
             gameThread = new Thread(this);
             gameThread.start();
         }
-
-
+        private final static int INVALID_POINTER_ID = -1;
+        // The ‘active pointer’ is the one currently moving our object.
+        private int mActivePointerId = INVALID_POINTER_ID;
+        //private ScaleGestureDetector mScaleDetector;
 
         @Override
         public boolean onTouchEvent(MotionEvent ev) {
-            final int x = (int) ev.getRawX();
-            final int y = (int) ev.getRawY();
-            int deltaX;
-
-
-
-
-            final int action = MotionEventCompat.getActionMasked(ev);
-
+            int action = MotionEventCompat.getActionMasked(ev);
+            Log.d("action", " PASS");
 
             switch (action) {
-                case MotionEvent.ACTION_DOWN:
-                    initalX = new InitalX((int)ev.getRawX());
+
+                case MotionEvent.ACTION_DOWN: {
+                    final int pointerIndex = MotionEventCompat.getActionIndex(ev);
+                    Log.d("pointerIndex", " PASS");
+                    mLastTouchX = MotionEventCompat.getX(ev, pointerIndex);
+                    Log.d("mLastTouchX", " PASS");
+                    //Save ID of this pointer
+                    mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
+                    Log.d("mActivePointerId", " PASS");
+                    break;
+                }
 
 
-                case MotionEvent.ACTION_MOVE:
-                    if (y > screenY / 2) {
-                        deltaX = x - initalX.getInitalX() ;
+                case MotionEvent.ACTION_MOVE: {
+                    final int pointerIndex =
+                            MotionEventCompat.findPointerIndex(ev, mActivePointerId);
 
-                        paddle1.update(1, deltaX, screenX);
+                    final float x = MotionEventCompat.getX(ev, pointerIndex);
+                    final float y = MotionEventCompat.getY(ev, pointerIndex);
+
+                    final float deltaX = x - mLastTouchX;
+
+                    paddle1.update(deltaX, screenX, y, screenY);
+                    paddle2.update(deltaX, screenX, y, screenY);
+
+                    invalidate();
+
+                    mLastTouchX = x;
+
+                    break;
+                }
+                case MotionEvent.ACTION_UP: {
+                    mActivePointerId = INVALID_POINTER_ID;
+                    break;
+                }
+                case MotionEvent.ACTION_CANCEL: {
+                    mActivePointerId = INVALID_POINTER_ID;
+                    break;
+                }
+
+                case MotionEvent.ACTION_POINTER_UP:{
+                    final int pointerIndex = MotionEventCompat.getActionIndex(ev);
+                    final int pointerId = MotionEventCompat.getPointerId(ev, pointerIndex);
+
+                    if (pointerId == mActivePointerId) {
+                        // This was our active pointer going up. Choose a new
+                        // active pointer and adjust accordingly.
+                        final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
+                        mLastTouchX = MotionEventCompat.getX(ev, newPointerIndex);
+                        mActivePointerId = MotionEventCompat.getPointerId(ev, newPointerIndex);
                     }
-                    if (y <= screenY / 2) {
-                        deltaX = x - initalX.getInitalX();
-                        paddle2.update(2, deltaX, screenX);
-                    }
-                    initalX.resetX((int)ev.getRawX());
-
-
-                case MotionEvent.ACTION_UP:
                     break;
-                case MotionEvent.ACTION_POINTER_DOWN:
-                    break;
-                case MotionEvent.ACTION_POINTER_UP:
-                    break;
-
+                }
             }
 
 
@@ -389,6 +411,7 @@ public class LocalMultiplayer extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d("Testing", "Resume");
 
         // Tell the gameView resume method to execute
         localMultiplayerView.resume();
@@ -401,6 +424,7 @@ public class LocalMultiplayer extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
+        Log.d("Testing: ", "Pause");
 
         // Tell the gameView pause method to execute
         localMultiplayerView.pause();
