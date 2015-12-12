@@ -23,16 +23,6 @@ public class Paddle {
     public float y1;
     public float y2;
 
-    // This will hold the pixels per second speedthat the paddle will move
-   /* private float paddleSpeed;
-
-    // Which ways can the paddle move
-    public final int STOPPED = 0;
-    public final int LEFT = 1;
-    public final int RIGHT = 2;
-
-    // Is the paddle moving and in which direction
-    private int paddleMoving = STOPPED;*/
 
     // This the the constructor method
     // When we create an object from this class we will pass
@@ -52,8 +42,7 @@ public class Paddle {
         rect1 = new RectF(x1, y1, x1 + length, y1 + height);
         rect2 = new RectF(x2, y2, x2 + length, y2 + height);
 
-        // How fast is the paddle in pixels per second
-        //paddleSpeed = 500;
+
     }
 
 
@@ -67,17 +56,6 @@ public class Paddle {
     }
 
 
-    // This method will be used to change/set if the paddle is going left, right or nowhere
-  /*  public void setMovementState(int state) {
-
-        paddleMoving = state;
-    }
-*/
-
-    // This update method will be called from update in BreakoutView
-    // It determines if the paddle needs to move and changes the coordinates
-    // contained in rect if necessary
-    
 
     public void update ( float x, int screenX, float y, int screenY){
         if (y > screenY / 2){

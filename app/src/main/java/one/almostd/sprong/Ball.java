@@ -36,9 +36,9 @@ public class Ball {
         return rect;
     }
 
-    public void update(/*long fps*/){
-        rect.left = rect.left + (xVelocity );
-        rect.top = rect.top + (yVelocity );
+    public void update(long fps){
+        rect.left = rect.left + (xVelocity / fps );
+        rect.top = rect.top + (yVelocity / fps );
         rect.right = rect.left + ballWidth;
         rect.bottom = rect.top + ballHeight;
     }

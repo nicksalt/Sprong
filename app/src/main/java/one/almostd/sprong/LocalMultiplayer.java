@@ -13,7 +13,6 @@ import android.support.v4.view.MotionEventCompat;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -64,11 +63,13 @@ public class LocalMultiplayer extends Activity {
         public int screenX;
         public int screenY;
 
-        private float mLastTouchX;
+        private float mLastTouchX1;
+        private float mLastTouchX2;
 
         // The players paddle
         Paddle paddle1;
         Paddle paddle2;
+
 
         // A ball
         Ball ball;
@@ -173,7 +174,7 @@ public class LocalMultiplayer extends Activity {
 
 
 
-            ball.update();
+            ball.update(fps);
 
             // Check for ball colliding with a brick
             for (int i = 0; i < numBricks; i++) {
@@ -333,75 +334,68 @@ public class LocalMultiplayer extends Activity {
             gameThread = new Thread(this);
             gameThread.start();
         }
-        private final static int INVALID_POINTER_ID = -1;
-        // The ‘active pointer’ is the one currently moving our object.
-        private int mActivePointerId = INVALID_POINTER_ID;
-        //private ScaleGestureDetector mScaleDetector;
+
+        private static final int INVALID_POINTER_ID = -1;
+        private int activePointer = INVALID_POINTER_ID;
+        private int newPointer = INVALID_POINTER_ID;
 
         @Override
-        public boolean onTouchEvent(MotionEvent ev) {
-            int action = MotionEventCompat.getActionMasked(ev);
-            Log.d("action", " PASS");
+        public boolean onTouchEvent(MotionEvent e) {
 
-            switch (action) {
-
+            switch (MotionEventCompat.getActionMasked(e)) {
                 case MotionEvent.ACTION_DOWN: {
-                    final int pointerIndex = MotionEventCompat.getActionIndex(ev);
-                    Log.d("pointerIndex", " PASS");
-                    mLastTouchX = MotionEventCompat.getX(ev, pointerIndex);
-                    Log.d("mLastTouchX", " PASS");
-                    //Save ID of this pointer
-                    mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
-                    Log.d("mActivePointerId", " PASS");
+                    final int pointerIndex = MotionEventCompat.getActionIndex(e);
+                    // Remember where we started (for dragging)
+                    mLastTouchX1 = MotionEventCompat.getX(e, pointerIndex);
+                    activePointer = MotionEventCompat.getPointerId(e, 0);
                     break;
                 }
-
-
                 case MotionEvent.ACTION_MOVE: {
-                    final int pointerIndex =
-                            MotionEventCompat.findPointerIndex(ev, mActivePointerId);
+                    if (activePointer != INVALID_POINTER_ID) {
+                        float x = MotionEventCompat.getX(e, activePointer);
+                        float y = MotionEventCompat.getY(e, activePointer);
+                        float deltaX = x - mLastTouchX1;
+                        paddle1.update(deltaX, screenX, y, screenY);
+                        paddle2.update(deltaX, screenX, y, screenY);
+                        mLastTouchX1 = x;
+                    }
+                    if (newPointer == 1) {
+                        final int pointerIndex = MotionEventCompat.findPointerIndex(e, newPointer);
 
-                    final float x = MotionEventCompat.getX(ev, pointerIndex);
-                    final float y = MotionEventCompat.getY(ev, pointerIndex);
+                        float x = MotionEventCompat.getX(e, pointerIndex);
+                        float y = MotionEventCompat.getY(e, pointerIndex);
+                        float deltaX = x - mLastTouchX2;
+                        paddle1.update(deltaX, screenX, y, screenY);
+                        paddle2.update(deltaX, screenX, y, screenY);
+                        mLastTouchX2 = x;
 
-                    final float deltaX = x - mLastTouchX;
-
-                    paddle1.update(deltaX, screenX, y, screenY);
-                    paddle2.update(deltaX, screenX, y, screenY);
-
-                    invalidate();
-
-                    mLastTouchX = x;
-
+                    }
+                    break;
+                }
+                case MotionEvent.ACTION_POINTER_DOWN: {
+                    int newPointerIndex = MotionEventCompat.getActionIndex(e);
+                    if (newPointerIndex == 1) {
+                        newPointer = MotionEventCompat.getPointerId(e, newPointerIndex);
+                        mLastTouchX2 = MotionEventCompat.getX(e, newPointerIndex);
+                    }
                     break;
                 }
                 case MotionEvent.ACTION_UP: {
-                    mActivePointerId = INVALID_POINTER_ID;
+                    activePointer = INVALID_POINTER_ID;
                     break;
                 }
+
                 case MotionEvent.ACTION_CANCEL: {
-                    mActivePointerId = INVALID_POINTER_ID;
+                    activePointer = INVALID_POINTER_ID;
                     break;
                 }
-
-                case MotionEvent.ACTION_POINTER_UP:{
-                    final int pointerIndex = MotionEventCompat.getActionIndex(ev);
-                    final int pointerId = MotionEventCompat.getPointerId(ev, pointerIndex);
-
-                    if (pointerId == mActivePointerId) {
-                        // This was our active pointer going up. Choose a new
-                        // active pointer and adjust accordingly.
-                        final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
-                        mLastTouchX = MotionEventCompat.getX(ev, newPointerIndex);
-                        mActivePointerId = MotionEventCompat.getPointerId(ev, newPointerIndex);
+                case MotionEvent.ACTION_POINTER_UP: {
+                    if (newPointer == 1) {
+                        newPointer = INVALID_POINTER_ID;
                     }
                     break;
                 }
             }
-
-
-
-
             return true;
         }
     }
