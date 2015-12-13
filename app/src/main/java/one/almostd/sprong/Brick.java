@@ -34,4 +34,5 @@ public class Brick {
         return isVisible;
     }
 
+
 }

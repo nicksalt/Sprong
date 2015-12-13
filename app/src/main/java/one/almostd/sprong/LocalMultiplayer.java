@@ -3,11 +3,16 @@ package one.almostd.sprong;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Picture;
 import android.graphics.Point;
 import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v4.view.MotionEventCompat;
 import android.util.Log;
@@ -70,6 +75,9 @@ public class LocalMultiplayer extends Activity {
         Paddle paddle1;
         Paddle paddle2;
 
+        Bitmap background = BitmapFactory.decodeResource(getResources(), R.drawable.deepfield16x9);
+
+
 
         // A ball
         Ball ball;
@@ -105,17 +113,27 @@ public class LocalMultiplayer extends Activity {
 
             screenX = size.x;
             screenY = size.y;
-
+            Log.d("X ", Integer.toString(screenX));
+            Log.d("Y ", Integer.toString(screenY));
             paddle1 = new Paddle(screenX, screenY);
             paddle2 = new Paddle(screenX, screenY);
-
             // Create a ball
             ball = new Ball(screenX, screenY);
+
 
 
             createBricksAndRestart();
 
         }
+        public void drawBackground() {
+            if (ourHolder.getSurface().isValid()) {
+                // Lock the canvas ready to draw
+                canvas = ourHolder.lockCanvas();
+
+
+            }
+        }
+
 
         public void createBricksAndRestart() {
 
@@ -181,7 +199,7 @@ public class LocalMultiplayer extends Activity {
 
                 if (bricks[i].getVisibility()) {
 
-                    if (RectF.intersects(bricks[i].getRect(), ball.getRect())) {
+                    if (RectF.intersects(ball.getRect(), bricks[i].getRect())) {
                         bricks[i].setInvisible();
                         ball.reverseYVelocity();
                         score = score + 10;
@@ -193,24 +211,24 @@ public class LocalMultiplayer extends Activity {
             // Check for ball colliding with paddle
             if (RectF.intersects(paddle1.getRect1(), ball.getRect())) {
                 ball.reverseYVelocity();
-                ball.clearObstacleY(screenY - 30);
+                ball.clearObstacleY(paddle1.getRect1().top);
             }
 
             if (RectF.intersects(paddle2.getRect2(), ball.getRect())) {
                 ball.reverseYVelocity();
-                ball.clearObstacleY(35);
+                ball.clearObstacleY(paddle2.getRect2().bottom + ball.ballHeight);
             }
 
 
             // Bounce the ball back when it hits the bottom of screen
-            if (ball.getRect().bottom > (screenY) &&
+            if (ball.getRect().bottom > (screenY - screenY / 24) &&
                     !RectF.intersects(paddle1.getRect1(), ball.getRect())) {
                 ball.reverseYVelocity();
-                ball.clearObstacleY(screenY - 2);
+                ball.clearObstacleY(screenY -screenY / 24 - 2);
 
 
                 // Lose a life
-                lives--;
+                //lives--;
 
                 if (lives == 0) {
                     paused = true;
@@ -220,10 +238,9 @@ public class LocalMultiplayer extends Activity {
             }
 
             // Bounce the ball back when it hits the top of screen
-            if (ball.getRect().top < 0 && !RectF.intersects(ball.getRect(), paddle2.getRect2())) {
-                ball.clearObstacleY(12);//was 12 as 12/10 = 1.2 & 1.2*25 = 30
+            if (ball.getRect().top < (screenY / 24) && !RectF.intersects(ball.getRect(), paddle2.getRect2())) {
+                ball.clearObstacleY(paddle2.getRect2().top + 25);
                 ball.reverseYVelocity();
-                lives--;
 
             }
 
@@ -258,7 +275,9 @@ public class LocalMultiplayer extends Activity {
                 canvas = ourHolder.lockCanvas();
 
                 canvas.drawColor(Color.BLACK);
-
+               // canvas.drawBitmap(background, -(screenX / 3), 0, paint);
+                paint.setTextSize(24);
+                canvas.drawText("Fps: " + " " + Long.toString(fps), 10, 50, paint);
                 // Choose the brush color for drawing
                 paint.setColor(Color.argb(255, 0, 0, 255));
 
@@ -267,7 +286,6 @@ public class LocalMultiplayer extends Activity {
 
                 //Draw paddle 2
                 canvas.drawRect(paddle2.getRect2(), paint);
-                //            canvas.drawBitmap(bitmapBackground, 0, 100, paint);
 
                 paint.setColor(Color.argb(255, 255, 255, 255));
 
@@ -330,9 +348,11 @@ public class LocalMultiplayer extends Activity {
             // Hide the status bar.
             int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
             decorView.setSystemUiVisibility(uiOptions);
+
             playing = true;
             gameThread = new Thread(this);
             gameThread.start();
+            drawBackground();
         }
 
         private static final int INVALID_POINTER_ID = -1;
@@ -344,6 +364,7 @@ public class LocalMultiplayer extends Activity {
 
             switch (MotionEventCompat.getActionMasked(e)) {
                 case MotionEvent.ACTION_DOWN: {
+                    paused=false;
                     final int pointerIndex = MotionEventCompat.getActionIndex(e);
                     // Remember where we started (for dragging)
                     mLastTouchX1 = MotionEventCompat.getX(e, pointerIndex);
