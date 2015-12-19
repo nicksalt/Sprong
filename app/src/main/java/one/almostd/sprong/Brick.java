@@ -2,13 +2,17 @@ package one.almostd.sprong;
 
 import android.graphics.RectF;
 
+import java.util.Random;
+
 /**
  * Created by Nick on 2015-12-01.
  */
 public class Brick {
     private RectF rect;
+    Random r = new Random();
 
     private boolean isVisible;
+    private int randomColour;
 
     public Brick(int row, int column, int width, int height){
 
@@ -20,6 +24,7 @@ public class Brick {
                 row * height + padding,
                 column * width + width - padding,
                 row * height + height - padding);
+        randomColour = r.nextInt(6);
     }
 
     public RectF getRect(){
@@ -32,6 +37,9 @@ public class Brick {
 
     public boolean getVisibility(){
         return isVisible;
+    }
+    public int getRandommColour(){
+        return randomColour;
     }
 
 

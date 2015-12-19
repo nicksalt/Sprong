@@ -23,6 +23,7 @@ import android.view.SurfaceView;
 import android.view.View;
 
 
+
 public class LocalMultiplayer extends Activity {
     /*Holds logic of the local multiplayer - like a motherboard of computer
     Will also respond to screen touches
@@ -75,7 +76,7 @@ public class LocalMultiplayer extends Activity {
         Paddle paddle1;
         Paddle paddle2;
 
-        Bitmap background = BitmapFactory.decodeResource(getResources(), R.drawable.deepfield16x9);
+        //Bitmap background = BitmapFactory.decodeResource(getResources(), R.drawable.deepfield16x9);
 
 
 
@@ -274,12 +275,12 @@ public class LocalMultiplayer extends Activity {
                 // Lock the canvas ready to draw
                 canvas = ourHolder.lockCanvas();
 
-                canvas.drawColor(Color.BLACK);
+                canvas.drawColor(Color.WHITE);
                // canvas.drawBitmap(background, -(screenX / 3), 0, paint);
                 paint.setTextSize(24);
                 canvas.drawText("Fps: " + " " + Long.toString(fps), 10, 50, paint);
                 // Choose the brush color for drawing
-                paint.setColor(Color.argb(255, 0, 0, 255));
+                paint.setColor(Color.BLUE);
 
                 // Draw the paddle
                 canvas.drawRect(paddle1.getRect1(), paint);
@@ -287,7 +288,7 @@ public class LocalMultiplayer extends Activity {
                 //Draw paddle 2
                 canvas.drawRect(paddle2.getRect2(), paint);
 
-                paint.setColor(Color.argb(255, 255, 255, 255));
+                paint.setColor(Color.BLACK);
 
                 // Draw the ball
                 canvas.drawRect(ball.getRect(), paint);
@@ -296,33 +297,32 @@ public class LocalMultiplayer extends Activity {
                 canvas.drawLine(0, (float) (screenY / 24), screenX, (float) (screenY / 24), paint);
 
                 // Change the brush color for drawing
-                paint.setColor(Color.argb(255, 255, 0, 0));
+
 
                 // Draw the bricks if visible
                 for (int i = 0; i < numBricks; i++) {
                     if (bricks[i].getVisibility()) {
+                        int num = bricks[i].getRandommColour();
+                        switch (num){
+                            case 1:
+                                paint.setColor(Color.BLUE);
+                                break;
+                            case 2:
+                                paint.setColor(Color.GREEN);
+                                break;
+                            case 3:
+                                paint.setColor(Color.MAGENTA);
+                                break;
+                            case 4:
+                                paint.setColor(Color.BLACK);
+                                break;
+                            default:
+                                paint.setColor(Color.RED);
+                        }
                         canvas.drawRect(bricks[i].getRect(), paint);
                     }
                 }
-
-                // Choose the brush color for drawing
-                paint.setColor(Color.argb(255, 255, 255, 255));
-
-
-
-                // Has the player cleared the screen?
-                if (score == numBricks * 10) {
-                    paint.setTextSize(90);
-                    canvas.drawText("YOU HAVE WON!", 10, screenY / 2, paint);
-                }
-
-                // Has the player lost?
-                if (lives <= 0) {
-                    paint.setTextSize(90);
-                    canvas.drawText("YOU HAVE LOST!", 10, screenY / 2, paint);
-                    createBricksAndRestart();
-                }
-
+                
                 // Draw everything to the screen
                 ourHolder.unlockCanvasAndPost(canvas);
             }
