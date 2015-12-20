@@ -200,11 +200,19 @@ public class LocalMultiplayer extends Activity {
 
                 if (bricks[i].getVisibility()) {
 
-                    if (RectF.intersects(ball.getRect(), bricks[i].getRect())) {
+                    if (bricks[i].getRect().left <= ball.getRect().right && bricks[i].getRect().right >= ball.getRect().left
+                            && bricks[i].getRect().centerY() <= ball.getRect().top && ball.getRect().top <= bricks[i].getRect().bottom) {
                         bricks[i].setInvisible();
                         ball.reverseYVelocity();
                         score = score + 10;
-
+                    }
+                }
+                if (bricks[i].getVisibility()) {
+                    if (bricks[i].getRect().top <= ball.getRect().bottom && bricks[i].getRect().bottom >= ball.getRect().top
+                            && bricks[i].getRect().centerX() <= ball.getRect().left && ball.getRect().left <= bricks[i].getRect().right){
+                        bricks[i].setInvisible();
+                        ball.reverseXVelocity();
+                        score = score + 10;
                     }
                 }
             }

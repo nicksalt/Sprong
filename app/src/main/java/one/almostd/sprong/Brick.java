@@ -41,6 +41,4 @@ public class Brick {
     public int getRandommColour(){
         return randomColour;
     }
-
-
 }
