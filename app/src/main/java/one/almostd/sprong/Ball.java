@@ -22,8 +22,8 @@ public class Ball {
         y = (screenY/2);
 
         // Start the ball travelling straight up at 100 pixels per second
-        xVelocity = 300;
-        yVelocity = -600;
+        xVelocity = 200;
+        yVelocity = -400;
 
         // Place the ball in the centre of the screen at the bottom
 

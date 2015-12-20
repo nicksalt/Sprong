@@ -76,7 +76,7 @@ public class LocalMultiplayer extends Activity {
         Paddle paddle1;
         Paddle paddle2;
 
-        //Bitmap background = BitmapFactory.decodeResource(getResources(), R.drawable.deepfield16x9);
+        //Bitmap background = BitmapFactory.decodeResource(getResources(), R.drawable.space1);
 
 
 
@@ -276,7 +276,7 @@ public class LocalMultiplayer extends Activity {
                 canvas = ourHolder.lockCanvas();
 
                 canvas.drawColor(Color.WHITE);
-               // canvas.drawBitmap(background, -(screenX / 3), 0, paint);
+                //canvas.drawBitmap(background, -(screenX / 3), 0, paint);
                 paint.setTextSize(24);
                 canvas.drawText("Fps: " + " " + Long.toString(fps), 10, 50, paint);
                 // Choose the brush color for drawing
@@ -322,7 +322,7 @@ public class LocalMultiplayer extends Activity {
                         canvas.drawRect(bricks[i].getRect(), paint);
                     }
                 }
-                
+
                 // Draw everything to the screen
                 ourHolder.unlockCanvasAndPost(canvas);
             }
