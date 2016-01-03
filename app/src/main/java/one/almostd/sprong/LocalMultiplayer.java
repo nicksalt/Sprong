@@ -76,16 +76,17 @@ public class LocalMultiplayer extends Activity {
         Paddle paddle1;
         Paddle paddle2;
 
-        //Bitmap background = BitmapFactory.decodeResource(getResources(), R.drawable.space1);
+        Bitmap background = BitmapFactory.decodeResource(getResources(), R.drawable.space1);
 
 
 
         // A ball
-        Ball ball;
+        Ball[] balls = new Ball[10];
+        int numBalls;
 
         // Up to 200 bricks
         Brick[] bricks = new Brick[72];
-        int numBricks = 0;
+        int numBricks;
         // The score
         int score = 0;
 
@@ -118,8 +119,7 @@ public class LocalMultiplayer extends Activity {
             Log.d("Y ", Integer.toString(screenY));
             paddle1 = new Paddle(screenX, screenY);
             paddle2 = new Paddle(screenX, screenY);
-            // Create a ball
-            ball = new Ball(screenX, screenY);
+
 
 
 
@@ -138,16 +138,18 @@ public class LocalMultiplayer extends Activity {
 
         public void createBricksAndRestart() {
 
-            // Put the ball back to the start
-            ball.reset(screenX, screenY);
+            balls[0] = new Ball(screenX, screenY, 1);
+            balls[1] = new Ball (screenX, screenY, 2);
+            numBalls = 2;
+
 
             int brickWidth = screenX / 10;
-            int brickHeight = screenY / 28;
+            int brickHeight = screenY / 25;
 
             // Build a wall of bricks
             numBricks = 0;
             for (int column = 2; column < 8; column++) {
-                for (int row = 8; row < 20; row++) {
+                for (int row = 7; row < 19; row++) {
                     bricks[numBricks] = new Brick(row, column, brickWidth, brickHeight);
                     numBricks++;
                 }
@@ -193,84 +195,112 @@ public class LocalMultiplayer extends Activity {
 
 
 
-            ball.update(fps);
+            for (int i = 0; i < numBalls; i++) {
+                balls[i].update(fps);
+            }
 
             // Check for ball colliding with a brick
             for (int i = 0; i < numBricks; i++) {
 
                 if (bricks[i].getVisibility()) {
+                    for (int k = 0; k < numBalls; k++){
+                        Ball ball = balls[k];
+                        if (RectF.intersects(ball.getRect(), bricks[i].getRect())) {
+                            if (bricks[i].getRect().left <= ball.getRect().right && bricks[i].getRect().right >= ball.getRect().left
+                                    && bricks[i].getRect().centerY() <= ball.getRect().top && ball.getRect().top <= bricks[i].getRect().bottom) {
+                                bricks[i].setInvisible();
+                                ball.reverseYVelocity();
+                                score = score + 10;
+                                break;
+                            }
 
-                    if (bricks[i].getRect().left <= ball.getRect().right && bricks[i].getRect().right >= ball.getRect().left
-                            && bricks[i].getRect().centerY() <= ball.getRect().top && ball.getRect().top <= bricks[i].getRect().bottom) {
-                        bricks[i].setInvisible();
-                        ball.reverseYVelocity();
-                        score = score + 10;
+                            if (bricks[i].getRect().left <= ball.getRect().right && bricks[i].getRect().right >= ball.getRect().left
+                                    && bricks[i].getRect().top <= ball.getRect().bottom && ball.getRect().bottom <= bricks[i].getRect().centerY()) {
+                                bricks[i].setInvisible();
+                                ball.reverseYVelocity();
+                                score = score + 10;
+                                break;
+                            }
+
+
+                            if (bricks[i].getRect().top <= ball.getRect().bottom && bricks[i].getRect().bottom >= ball.getRect().top
+                                    && bricks[i].getRect().centerX() <= ball.getRect().left && ball.getRect().left <= bricks[i].getRect().right) {
+                                bricks[i].setInvisible();
+                                ball.reverseXVelocity();
+                                score = score + 10;
+                                break;
+                            }
+
+                            if (bricks[i].getRect().top <= ball.getRect().bottom && bricks[i].getRect().bottom >= ball.getRect().top
+                                    && bricks[i].getRect().left <= ball.getRect().right && ball.getRect().right <= bricks[i].getRect().centerX()) {
+                                bricks[i].setInvisible();
+                                ball.reverseXVelocity();
+                                score = score + 10;
+                                break;
+                            }
+                        }
                     }
                 }
-                if (bricks[i].getVisibility()) {
-                    if (bricks[i].getRect().top <= ball.getRect().bottom && bricks[i].getRect().bottom >= ball.getRect().top
-                            && bricks[i].getRect().centerX() <= ball.getRect().left && ball.getRect().left <= bricks[i].getRect().right){
-                        bricks[i].setInvisible();
-                        ball.reverseXVelocity();
-                        score = score + 10;
+            }
+            for (int k = 0; k < numBalls; k++) {
+                Ball ball = balls[k];
+
+
+                // Check for ball colliding with paddle
+                if (RectF.intersects(paddle1.getRect1(), ball.getRect())) {
+                    ball.reverseYVelocity();
+                    ball.clearObstacleY(paddle1.getRect1().top);
+                }
+
+                if (RectF.intersects(paddle2.getRect2(), ball.getRect())) {
+                    ball.reverseYVelocity();
+                    ball.clearObstacleY(paddle2.getRect2().bottom + ball.ballHeight);
+                }
+
+
+                // Bounce the ball back when it hits the bottom of screen
+                if (ball.getRect().bottom > (screenY - screenY / 24) &&
+                        !RectF.intersects(paddle1.getRect1(), ball.getRect())) {
+                    ball.reverseYVelocity();
+                    ball.clearObstacleY(screenY - screenY / 24 - 2);
+
+
+                    // Lose a life
+                    //lives--;
+
+                    if (lives == 0) {
+                        paused = true;
+                        createBricksAndRestart();
                     }
-                }
-            }
 
-            // Check for ball colliding with paddle
-            if (RectF.intersects(paddle1.getRect1(), ball.getRect())) {
-                ball.reverseYVelocity();
-                ball.clearObstacleY(paddle1.getRect1().top);
-            }
-
-            if (RectF.intersects(paddle2.getRect2(), ball.getRect())) {
-                ball.reverseYVelocity();
-                ball.clearObstacleY(paddle2.getRect2().bottom + ball.ballHeight);
-            }
-
-
-            // Bounce the ball back when it hits the bottom of screen
-            if (ball.getRect().bottom > (screenY - screenY / 24) &&
-                    !RectF.intersects(paddle1.getRect1(), ball.getRect())) {
-                ball.reverseYVelocity();
-                ball.clearObstacleY(screenY -screenY / 24 - 2);
-
-
-                // Lose a life
-                //lives--;
-
-                if (lives == 0) {
-                    paused = true;
-                    createBricksAndRestart();
                 }
 
+                // Bounce the ball back when it hits the top of screen
+                if (ball.getRect().top < (screenY / 24) && !RectF.intersects(ball.getRect(), paddle2.getRect2())) {
+                    ball.clearObstacleY(paddle2.getRect2().top + 25);
+                    ball.reverseYVelocity();
+
+                }
+
+                // If the ball hits left wall bounce
+                if (ball.getRect().left < 0) {
+                    ball.reverseXVelocity();
+                    ball.clearObstacleX(1);
+                }
+
+                // If the ball hits right wall bounce
+                if (ball.getRect().right > screenX) {
+                    ball.reverseXVelocity();
+                    ball.clearObstacleX(screenX - 27);
+
+                }
             }
-
-            // Bounce the ball back when it hits the top of screen
-            if (ball.getRect().top < (screenY / 24) && !RectF.intersects(ball.getRect(), paddle2.getRect2())) {
-                ball.clearObstacleY(paddle2.getRect2().top + 25);
-                ball.reverseYVelocity();
-
-            }
-
-            // If the ball hits left wall bounce
-            if (ball.getRect().left < 0) {
-                ball.reverseXVelocity();
-                ball.clearObstacleX(1);
-            }
-
-            // If the ball hits right wall bounce
-            if (ball.getRect().right > screenX) {
-                ball.reverseXVelocity();
-                ball.clearObstacleX(screenX - 27);
-
-            }
-
             // Pause if cleared screen
             if (score == numBricks * 10) {
                 paused = true;
                 createBricksAndRestart();
             }
+
 
         }
 
@@ -299,7 +329,10 @@ public class LocalMultiplayer extends Activity {
                 paint.setColor(Color.BLACK);
 
                 // Draw the ball
-                canvas.drawRect(ball.getRect(), paint);
+                for (int k = 0; k < numBalls; k++) {
+                    Ball ball = balls[k];
+                    canvas.drawOval(ball.getRect(), paint);
+                }
                 //draw lines for touch area
                 canvas.drawLine(0, (float) (screenY - (screenY / 24)), screenX, ((float) (screenY - (screenY / 24))), paint);
                 canvas.drawLine(0, (float) (screenY / 24), screenX, (float) (screenY / 24), paint);

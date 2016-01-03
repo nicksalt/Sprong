@@ -8,26 +8,36 @@ import java.util.Random;
  * Created by Nick on 2015-12-01.
  */
 public class Ball {
-    RectF rect;
+    public RectF rect;
     float xVelocity;
     float yVelocity;
     public float x;
     public float y;
-    float ballWidth = 25;
-    float ballHeight = 25;
+    float ballWidth;
+    float ballHeight;
 
-    public Ball(int screenX, int screenY){
 
-        x = screenX / 2;
-        y = (screenY/2);
-
+    public Ball(int screenX, int screenY, int player){
+        ballWidth = 20;
+        ballHeight = 20;
+        x = screenX/2 ;
+        if (player == 1) {
+            y = screenY - screenY / 5;
+            xVelocity = 200;
+            yVelocity = 400;
+        }
+        else {
+            y = screenY / 5;
+            xVelocity = -200;
+            yVelocity = -400;
+        }
+        rect = new RectF(x , y, x + ballWidth, y + ballHeight);
         // Start the ball travelling straight up at 100 pixels per second
-        xVelocity = 200;
-        yVelocity = -400;
+
 
         // Place the ball in the centre of the screen at the bottom
 
-        rect = new RectF(x, y , x + ballWidth, y + ballHeight);
+
 
     }
 
@@ -51,14 +61,7 @@ public class Ball {
         xVelocity = - xVelocity;
     }
 
-    public void setRandomXVelocity(){
-        Random generator = new Random();
-        int answer = generator.nextInt(2);
 
-        if(answer == 0){
-            reverseXVelocity();
-        }
-    }
 
     public void clearObstacleY(float y){
         rect.bottom = y;
@@ -70,9 +73,14 @@ public class Ball {
         rect.right = rect.left + ballWidth;
     }
 
-    public void reset(int x, int y){
+    public void reset(int x, int y, boolean top){
         rect.left = x / 2;
-        rect.top = y - 50;
+        if (top){
+            rect.top = y/5;
+        }
+        else {
+            rect.top = y - y / 5;
+        }
         rect.right = rect.left + ballWidth;
         rect.bottom = rect.top - ballHeight;
     }
