@@ -8,13 +8,14 @@ import java.util.Random;
  * Created by Nick on 2015-12-01.
  */
 public class Ball {
-    public RectF rect;
+    RectF rect;
     float xVelocity;
     float yVelocity;
     public float x;
     public float y;
     float ballWidth;
     float ballHeight;
+    public int lastPaddleHit;
 
 
     public Ball(int screenX, int screenY, int player){
@@ -42,9 +43,9 @@ public class Ball {
     }
 
     public RectF getRect(){
-
         return rect;
     }
+
 
     public void update(long fps){
         rect.left = rect.left + (xVelocity / fps );

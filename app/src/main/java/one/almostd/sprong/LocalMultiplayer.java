@@ -88,10 +88,10 @@ public class LocalMultiplayer extends Activity {
         Brick[] bricks = new Brick[72];
         int numBricks;
         // The score
-        int score = 0;
+        int score1;
+        int score2;
 
-        // Lives
-        int lives = 3;
+
 
         // When the we initialize (call new()) on gameView
         // This special constructor method runs
@@ -155,11 +155,7 @@ public class LocalMultiplayer extends Activity {
                 }
             }
 
-            // if game over reset scores and lives
-            if (lives == 0) {
-                score = 0;
-                lives = 3;
-            }
+
 
         }
 
@@ -206,38 +202,37 @@ public class LocalMultiplayer extends Activity {
                     for (int k = 0; k < numBalls; k++){
                         Ball ball = balls[k];
                         if (RectF.intersects(ball.getRect(), bricks[i].getRect())) {
-                            if (bricks[i].getRect().left <= ball.getRect().right && bricks[i].getRect().right >= ball.getRect().left
-                                    && bricks[i].getRect().centerY() <= ball.getRect().top && ball.getRect().top <= bricks[i].getRect().bottom) {
-                                bricks[i].setInvisible();
+                            Point top = new Point((int)ball.getRect().centerX(),(int)ball.getRect().top);
+                            Point bottom = new Point((int)ball.getRect().centerX(),(int)ball.getRect().bottom);
+                            Point right = new Point((int)ball.getRect().right ,(int)ball.getRect().centerY());
+                            Point left = new Point((int)ball.getRect().left ,(int)ball.getRect().centerY());
+
+                            if (bricks[i].getRect().contains(top.x,top.y)){
                                 ball.reverseYVelocity();
-                                score = score + 10;
-                                break;
-                            }
-
-                            if (bricks[i].getRect().left <= ball.getRect().right && bricks[i].getRect().right >= ball.getRect().left
-                                    && bricks[i].getRect().top <= ball.getRect().bottom && ball.getRect().bottom <= bricks[i].getRect().centerY()) {
                                 bricks[i].setInvisible();
+                            }
+                            if (bricks[i].getRect().contains(bottom.x,bottom.y)){
                                 ball.reverseYVelocity();
-                                score = score + 10;
-                                break;
-                            }
-
-
-                            if (bricks[i].getRect().top <= ball.getRect().bottom && bricks[i].getRect().bottom >= ball.getRect().top
-                                    && bricks[i].getRect().centerX() <= ball.getRect().left && ball.getRect().left <= bricks[i].getRect().right) {
                                 bricks[i].setInvisible();
-                                ball.reverseXVelocity();
-                                score = score + 10;
-                                break;
                             }
 
-                            if (bricks[i].getRect().top <= ball.getRect().bottom && bricks[i].getRect().bottom >= ball.getRect().top
-                                    && bricks[i].getRect().left <= ball.getRect().right && ball.getRect().right <= bricks[i].getRect().centerX()) {
-                                bricks[i].setInvisible();
+                            if (bricks[i].getRect().contains(right.x,right.y)){
                                 ball.reverseXVelocity();
-                                score = score + 10;
-                                break;
+                                bricks[i].setInvisible();
                             }
+
+                            if (bricks[i].getRect().contains(left.x,left.y)){
+                                ball.reverseXVelocity();
+                                bricks[i].setInvisible();
+                            }
+
+                            if (ball.lastPaddleHit == 1){
+                                score1 += 10;
+                            }
+                            else {
+                                score2+=10;
+                            }
+
                         }
                     }
                 }
@@ -246,15 +241,17 @@ public class LocalMultiplayer extends Activity {
                 Ball ball = balls[k];
 
 
-                // Check for ball colliding with paddle
+                // Check for ball colliding with paddle 1
                 if (RectF.intersects(paddle1.getRect1(), ball.getRect())) {
                     ball.reverseYVelocity();
                     ball.clearObstacleY(paddle1.getRect1().top);
+                    ball.lastPaddleHit = 1;
                 }
 
                 if (RectF.intersects(paddle2.getRect2(), ball.getRect())) {
                     ball.reverseYVelocity();
                     ball.clearObstacleY(paddle2.getRect2().bottom + ball.ballHeight);
+                    ball.lastPaddleHit = 2;
                 }
 
 
@@ -265,13 +262,6 @@ public class LocalMultiplayer extends Activity {
                     ball.clearObstacleY(screenY - screenY / 24 - 2);
 
 
-                    // Lose a life
-                    //lives--;
-
-                    if (lives == 0) {
-                        paused = true;
-                        createBricksAndRestart();
-                    }
 
                 }
 
@@ -296,7 +286,7 @@ public class LocalMultiplayer extends Activity {
                 }
             }
             // Pause if cleared screen
-            if (score == numBricks * 10) {
+            if (score1+score2 == numBricks * 10) {
                 paused = true;
                 createBricksAndRestart();
             }
@@ -316,7 +306,7 @@ public class LocalMultiplayer extends Activity {
                 canvas.drawColor(Color.WHITE);
                 //canvas.drawBitmap(background, -(screenX / 3), 0, paint);
                 paint.setTextSize(24);
-                canvas.drawText("Fps: " + " " + Long.toString(fps), 10, 50, paint);
+                canvas.drawText("Fps: " + " " + Float.toString(screenX), 10, 50, paint);
                 // Choose the brush color for drawing
                 paint.setColor(Color.BLUE);
 
@@ -337,7 +327,7 @@ public class LocalMultiplayer extends Activity {
                 canvas.drawLine(0, (float) (screenY - (screenY / 24)), screenX, ((float) (screenY - (screenY / 24))), paint);
                 canvas.drawLine(0, (float) (screenY / 24), screenX, (float) (screenY / 24), paint);
 
-                // Change the brush color for drawing
+
 
 
                 // Draw the bricks if visible
@@ -363,6 +353,13 @@ public class LocalMultiplayer extends Activity {
                         canvas.drawRect(bricks[i].getRect(), paint);
                     }
                 }
+
+                paint.setTextSize(96);
+                canvas.drawText("Score: " + " " + Integer.toString(score1), 10, screenY - 10, paint);
+                canvas.rotate(180, screenX - 10, 10);
+                canvas.drawText("Score: " + " " + Integer.toString(score2), screenX - 10, 10, paint);
+                //canvas.restore();
+
 
                 // Draw everything to the screen
                 ourHolder.unlockCanvasAndPost(canvas);
