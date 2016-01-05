@@ -7,12 +7,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Picture;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v4.view.MotionEventCompat;
 import android.util.Log;
@@ -20,8 +18,7 @@ import android.view.Display;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
-
+import android.view.WindowManager;
 
 
 public class LocalMultiplayer extends Activity {
@@ -38,6 +35,8 @@ public class LocalMultiplayer extends Activity {
         //Init localmultiplayerview and set it as the view
         localMultiplayerView = new LocalMultiplayerView(this);
         setContentView(localMultiplayerView);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 
     }
@@ -76,7 +75,8 @@ public class LocalMultiplayer extends Activity {
         Paddle paddle1;
         Paddle paddle2;
 
-        Bitmap background = BitmapFactory.decodeResource(getResources(), R.drawable.space1);
+        Bitmap background;
+
 
 
 
@@ -103,13 +103,12 @@ public class LocalMultiplayer extends Activity {
             // Initialize ourHolder and paint objects
             ourHolder = getHolder();
             paint = new Paint();
-            //bitmapBackground = BitmapFactory.decodeResource(this.getResources(), R.drawable.moon);
+            background = BitmapFactory.decodeResource(this.getResources(), R.drawable.deepfield16x9);
             // Get a Display object to access screen details
             Display display = getWindowManager().getDefaultDisplay();
             // Load the resolution into a Point object
             Point size = new Point();
             display.getSize(size);
-
 
 
 
@@ -125,14 +124,6 @@ public class LocalMultiplayer extends Activity {
 
             createBricksAndRestart();
 
-        }
-        public void drawBackground() {
-            if (ourHolder.getSurface().isValid()) {
-                // Lock the canvas ready to draw
-                canvas = ourHolder.lockCanvas();
-
-
-            }
         }
 
 
@@ -171,9 +162,11 @@ public class LocalMultiplayer extends Activity {
                 if (!paused) {
                     update();
                 }
-
+                /*Bitmap bitmap = Bitmap.createBitmap(width, height, Config.RGB_565);
+                Canvas c = new Canvas(bitmap);*/
                 // Draw the frame
                 draw();
+
 
                 // Calculate the fps this frame
                 // We can then use the result to
@@ -304,11 +297,15 @@ public class LocalMultiplayer extends Activity {
                 canvas = ourHolder.lockCanvas();
 
                 canvas.drawColor(Color.WHITE);
-                //canvas.drawBitmap(background, -(screenX / 3), 0, paint);
-                paint.setTextSize(24);
-                canvas.drawText("Fps: " + " " + Float.toString(screenX), 10, 50, paint);
+                Rect dest = new Rect(0, 0, getWidth(), getHeight());
+                Paint paint = new Paint();
+                paint.setFilterBitmap(true);
+                canvas.drawBitmap(background, null, dest, paint);
                 // Choose the brush color for drawing
                 paint.setColor(Color.BLUE);
+
+                paint.setTextSize(24);
+                canvas.drawText("Fps: " + " " + Float.toString(fps), 10, 50, paint);
 
                 // Draw the paddle
                 canvas.drawRect(paddle1.getRect1(), paint);
@@ -316,7 +313,7 @@ public class LocalMultiplayer extends Activity {
                 //Draw paddle 2
                 canvas.drawRect(paddle2.getRect2(), paint);
 
-                paint.setColor(Color.BLACK);
+                paint.setColor(Color.WHITE);
 
                 // Draw the ball
                 for (int k = 0; k < numBalls; k++) {
@@ -345,7 +342,7 @@ public class LocalMultiplayer extends Activity {
                                 paint.setColor(Color.MAGENTA);
                                 break;
                             case 4:
-                                paint.setColor(Color.BLACK);
+                                paint.setColor(Color.WHITE);
                                 break;
                             default:
                                 paint.setColor(Color.RED);
@@ -354,7 +351,7 @@ public class LocalMultiplayer extends Activity {
                     }
                 }
 
-                paint.setTextSize(96);
+                paint.setTextSize((int)(canvas.getHeight()/22.5));
                 canvas.drawText("Score: " + " " + Integer.toString(score1), 10, screenY - 10, paint);
                 canvas.rotate(180, screenX - 10, 10);
                 canvas.drawText("Score: " + " " + Integer.toString(score2), screenX - 10, 10, paint);
@@ -382,15 +379,10 @@ public class LocalMultiplayer extends Activity {
         // If SimpleGameEngine Activity is started theb
         // start our thread.
         public void resume() {
-            View decorView = getWindow().getDecorView();
-            // Hide the status bar.
-            int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-            decorView.setSystemUiVisibility(uiOptions);
 
             playing = true;
             gameThread = new Thread(this);
             gameThread.start();
-            drawBackground();
         }
 
         private static final int INVALID_POINTER_ID = -1;
