@@ -3,6 +3,7 @@ package one.almostd.sprong;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -92,6 +93,16 @@ public class LocalMultiplayer extends Activity {
         int score2;
 
 
+        RectF leftPause1 = new RectF((float) (screenX*.76), screenY - screenY/24,(float) (screenX*.79), screenY);
+        RectF rightPause1 = new RectF((float) (screenX*.81), screenY - screenY/24,(float) (screenX*.84), screenY);
+
+        RectF leftPause2 = new RectF((float) (screenX*.16), screenY/24,(float) (screenX*.19), 0);
+        RectF rightPause2 = new RectF((float) (screenX*.21), screenY/24,(float) (screenX*.24), 0);
+
+        boolean fpsBackground = true;
+        int fpsLow;
+        int bricksInvisible;
+
 
         // When the we initialize (call new()) on gameView
         // This special constructor method runs
@@ -156,14 +167,21 @@ public class LocalMultiplayer extends Activity {
 
                 // Capture the current time in milliseconds in startFrameTime
                 long startFrameTime = System.currentTimeMillis();
+                //Insert
 
                 // Update the frame
                 // Update the frame
                 if (!paused) {
                     update();
+                    if (fps<18 && fpsBackground){
+                        Log.d("Fps", Long.toString(fps));
+                        fpsLow+=1;
+                        if (fpsLow >= 3) {
+                            fpsBackground = false;
+                        }
+                    }
+
                 }
-                /*Bitmap bitmap = Bitmap.createBitmap(width, height, Config.RGB_565);
-                Canvas c = new Canvas(bitmap);*/
                 // Draw the frame
                 draw();
 
@@ -175,6 +193,7 @@ public class LocalMultiplayer extends Activity {
                 if (timeThisFrame >= 1) {
                     fps = 1000 / timeThisFrame;
                 }
+
 
             }
 
@@ -190,7 +209,7 @@ public class LocalMultiplayer extends Activity {
 
             // Check for ball colliding with a brick
             for (int i = 0; i < numBricks; i++) {
-
+                brickloop:
                 if (bricks[i].getVisibility()) {
                     for (int k = 0; k < numBalls; k++){
                         Ball ball = balls[k];
@@ -200,31 +219,42 @@ public class LocalMultiplayer extends Activity {
                             Point right = new Point((int)ball.getRect().right ,(int)ball.getRect().centerY());
                             Point left = new Point((int)ball.getRect().left ,(int)ball.getRect().centerY());
 
-                            if (bricks[i].getRect().contains(top.x,top.y)){
+                            if (bricks[i].getRect().contains(top.x,top.y) ||
+                                    bricks[i].getRect().contains(bottom.x,bottom.y)) {
                                 ball.reverseYVelocity();
                                 bricks[i].setInvisible();
-                            }
-                            if (bricks[i].getRect().contains(bottom.x,bottom.y)){
-                                ball.reverseYVelocity();
-                                bricks[i].setInvisible();
+                                switch (ball.lastPaddleHit){
+                                    case 1:
+                                        score1+=10;
+                                        break;
+                                    case 2:
+                                        score2+=10;
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                bricksInvisible+=1;
+                                break brickloop;
                             }
 
-                            if (bricks[i].getRect().contains(right.x,right.y)){
+                            if (bricks[i].getRect().contains(right.x,right.y) ||
+                                    bricks[i].getRect().contains(left.x,left.y)){
                                 ball.reverseXVelocity();
                                 bricks[i].setInvisible();
+                                switch (ball.lastPaddleHit){
+                                    case 1:
+                                        score1+=10;
+                                        break;
+                                    case 2:
+                                        score2+=10;
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                bricksInvisible+=1;
+                                break brickloop;
                             }
-
-                            if (bricks[i].getRect().contains(left.x,left.y)){
-                                ball.reverseXVelocity();
-                                bricks[i].setInvisible();
-                            }
-
-                            if (ball.lastPaddleHit == 1){
-                                score1 += 10;
-                            }
-                            else {
-                                score2+=10;
-                            }
+                            Log.d("Break: ", "Fail");
 
                         }
                     }
@@ -253,6 +283,8 @@ public class LocalMultiplayer extends Activity {
                         !RectF.intersects(paddle1.getRect1(), ball.getRect())) {
                     ball.reverseYVelocity();
                     ball.clearObstacleY(screenY - screenY / 24 - 2);
+                    ball.lastPaddleHit=0;
+
 
 
 
@@ -262,6 +294,7 @@ public class LocalMultiplayer extends Activity {
                 if (ball.getRect().top < (screenY / 24) && !RectF.intersects(ball.getRect(), paddle2.getRect2())) {
                     ball.clearObstacleY(paddle2.getRect2().top + 25);
                     ball.reverseYVelocity();
+                    ball.lastPaddleHit=0;
 
                 }
 
@@ -278,12 +311,12 @@ public class LocalMultiplayer extends Activity {
 
                 }
             }
-            // Pause if cleared screen
-            if (score1+score2 == numBricks * 10) {
-                paused = true;
-                createBricksAndRestart();
-            }
 
+
+            if (numBricks==bricksInvisible){
+                paused=true;
+                startActivity(new Intent(LocalMultiplayer.this, LmGameOver.class));
+            }
 
         }
 
@@ -295,15 +328,20 @@ public class LocalMultiplayer extends Activity {
             if (ourHolder.getSurface().isValid()) {
                 // Lock the canvas ready to draw
                 canvas = ourHolder.lockCanvas();
-
-                canvas.drawColor(Color.WHITE);
-                Rect dest = new Rect(0, 0, getWidth(), getHeight());
-                Paint paint = new Paint();
-                paint.setFilterBitmap(true);
-                canvas.drawBitmap(background, null, dest, paint);
-                // Choose the brush color for drawing
+                if (fpsBackground) {
+                    RectF dest = new RectF(0, 0, getWidth(), getHeight());
+                    paint.setFilterBitmap(true);
+                    canvas.drawBitmap(background, null, dest, paint);
+                }
+                else {
+                    canvas.drawColor(Color.BLACK);
+                }
+                paint.setColor(Color.WHITE);
+                canvas.drawRect(leftPause1, paint);
+                canvas.drawRect(rightPause1, paint);
+                canvas.drawRect(leftPause2, paint);
+                canvas.drawRect(rightPause2, paint);
                 paint.setColor(Color.BLUE);
-
                 paint.setTextSize(24);
                 canvas.drawText("Fps: " + " " + Float.toString(fps), 10, 50, paint);
 
@@ -342,7 +380,7 @@ public class LocalMultiplayer extends Activity {
                                 paint.setColor(Color.MAGENTA);
                                 break;
                             case 4:
-                                paint.setColor(Color.WHITE);
+                                paint.setColor(Color.YELLOW);
                                 break;
                             default:
                                 paint.setColor(Color.RED);
@@ -383,6 +421,8 @@ public class LocalMultiplayer extends Activity {
             playing = true;
             gameThread = new Thread(this);
             gameThread.start();
+
+
         }
 
         private static final int INVALID_POINTER_ID = -1;
