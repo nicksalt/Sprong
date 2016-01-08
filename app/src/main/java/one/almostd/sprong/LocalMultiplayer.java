@@ -181,9 +181,8 @@ public class LocalMultiplayer extends Activity {
                 if (!paused) {
                     update();
                     if (fps<18 && fpsBackground){
-                        Log.d("Fps", Long.toString(fps));
                         fpsLow+=1;
-                        if (fpsLow >= 3) {
+                        if (fpsLow >= 2) {
                             fpsBackground = false;
                         }
                     }
@@ -279,7 +278,6 @@ public class LocalMultiplayer extends Activity {
                     ball.clearObstacleY(paddle1.getRect1().top);
                     ball.lastPaddleHit = 1;
                     ball.xVelocity += (xVelocityPaddle1/30);
-                    Log.d("X Velocity", Float.toString(ball.xVelocity));
                 }
 
                 if (RectF.intersects(paddle2.getRect2(), ball.getRect())) {
@@ -287,7 +285,6 @@ public class LocalMultiplayer extends Activity {
                     ball.clearObstacleY(paddle2.getRect2().bottom + ball.ballHeight);
                     ball.lastPaddleHit = 2;
                     ball.xVelocity += (xVelocityPaddle2/30);
-                    //Log.d("X Velocity", Float.toString(ball.xVelocity));
                 }
 
 
@@ -468,6 +465,7 @@ public class LocalMultiplayer extends Activity {
                     mVelocityTracker1.addMovement(e);
                 }
                 case MotionEvent.ACTION_MOVE: {
+                    Log.d("NewPointer", Integer.toString(newPointer));
                     if (activePointer != INVALID_POINTER_ID) {
                         mVelocityTracker1.addMovement(e);
                         // When you want to determine the velocity, call
@@ -497,10 +495,10 @@ public class LocalMultiplayer extends Activity {
                                     pointerId);
                         }
                         mLastTouchX1 = x;
-                        break;
-
                     }
+
                     if (newPointer == 1) {
+                        Log.d("Test", "Pointer");
                         final int pointerIndex = MotionEventCompat.findPointerIndex(e, newPointer);
                         mVelocityTracker2.addMovement(e);
                         // When you want to determine the velocity, call
@@ -532,7 +530,6 @@ public class LocalMultiplayer extends Activity {
                         }
                         mLastTouchX2 = x;
 
-                        break;
 
                     }
                     break;
@@ -541,6 +538,7 @@ public class LocalMultiplayer extends Activity {
                     int newPointerIndex = MotionEventCompat.getActionIndex(e);
                     if (newPointerIndex == 1) {
                         newPointer = MotionEventCompat.getPointerId(e, newPointerIndex);
+                        Log.d("New Pointer ", Integer.toString(newPointer));
                         mLastTouchX2 = MotionEventCompat.getX(e, newPointerIndex);
                         if(mVelocityTracker2 == null) {
                             // Retrieve a new VelocityTracker object to watch the velocity of a motion.
