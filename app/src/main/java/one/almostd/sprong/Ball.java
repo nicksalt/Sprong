@@ -2,7 +2,6 @@ package one.almostd.sprong;
 
 import android.graphics.RectF;
 
-import java.util.Random;
 
 /**
  * Created by Nick on 2015-12-01.
@@ -19,16 +18,16 @@ public class Ball {
 
 
     public Ball(int screenX, int screenY, int player){
-        ballWidth = 20;
-        ballHeight = 20;
+        ballWidth = screenX/36;
+        ballHeight = screenX/36;
         x = screenX/2 ;
         if (player == 1) {
-            y = screenY - screenY / 5;
+            y = (float) (screenY - screenY / 4.5);
             xVelocity = 200;
             yVelocity = 400;
         }
         else {
-            y = screenY / 5;
+            y = (float) (screenY / 4.5);
             xVelocity = -200;
             yVelocity = -400;
         }
@@ -77,11 +76,13 @@ public class Ball {
     public void reset(int x, int y, boolean top){
         rect.left = x / 2;
         if (top){
-            rect.top = y/5;
+            rect.top = (float) (y/4.5);
         }
         else {
-            rect.top = y - y / 5;
+            rect.top = (float) (y - y / 4.5);
         }
+        yVelocity=-yVelocity;
+        xVelocity=200;
         rect.right = rect.left + ballWidth;
         rect.bottom = rect.top - ballHeight;
     }

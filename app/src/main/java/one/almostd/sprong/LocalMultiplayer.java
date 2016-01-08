@@ -10,16 +10,18 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.v4.view.MotionEventCompat;
+import android.support.v4.view.VelocityTrackerCompat;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.VelocityTracker;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 
 public class LocalMultiplayer extends Activity {
@@ -72,6 +74,11 @@ public class LocalMultiplayer extends Activity {
         private float mLastTouchX1;
         private float mLastTouchX2;
 
+        VelocityTracker mVelocityTracker1 = null;
+        VelocityTracker mVelocityTracker2 = null;
+        long xVelocityPaddle1;
+        long xVelocityPaddle2;
+
         // The players paddle
         Paddle paddle1;
         Paddle paddle2;
@@ -89,8 +96,8 @@ public class LocalMultiplayer extends Activity {
         Brick[] bricks = new Brick[72];
         int numBricks;
         // The score
-        int score1;
-        int score2;
+        public int score1;
+        public int score2;
 
 
         RectF leftPause1 = new RectF((float) (screenX*.76), screenY - screenY/24,(float) (screenX*.79), screenY);
@@ -180,6 +187,9 @@ public class LocalMultiplayer extends Activity {
                             fpsBackground = false;
                         }
                     }
+                    else {
+                        fpsLow = 0;
+                    }
 
                 }
                 // Draw the frame
@@ -213,7 +223,7 @@ public class LocalMultiplayer extends Activity {
                 if (bricks[i].getVisibility()) {
                     for (int k = 0; k < numBalls; k++){
                         Ball ball = balls[k];
-                        if (RectF.intersects(ball.getRect(), bricks[i].getRect())) {
+                        //if (RectF.intersects(ball.getRect(), bricks[i].getRect())) {
                             Point top = new Point((int)ball.getRect().centerX(),(int)ball.getRect().top);
                             Point bottom = new Point((int)ball.getRect().centerX(),(int)ball.getRect().bottom);
                             Point right = new Point((int)ball.getRect().right ,(int)ball.getRect().centerY());
@@ -254,9 +264,8 @@ public class LocalMultiplayer extends Activity {
                                 bricksInvisible+=1;
                                 break brickloop;
                             }
-                            Log.d("Break: ", "Fail");
 
-                        }
+                        //}
                     }
                 }
             }
@@ -269,21 +278,24 @@ public class LocalMultiplayer extends Activity {
                     ball.reverseYVelocity();
                     ball.clearObstacleY(paddle1.getRect1().top);
                     ball.lastPaddleHit = 1;
+                    ball.xVelocity += (xVelocityPaddle1/30);
+                    Log.d("X Velocity", Float.toString(ball.xVelocity));
                 }
 
                 if (RectF.intersects(paddle2.getRect2(), ball.getRect())) {
                     ball.reverseYVelocity();
                     ball.clearObstacleY(paddle2.getRect2().bottom + ball.ballHeight);
                     ball.lastPaddleHit = 2;
+                    ball.xVelocity += (xVelocityPaddle2/30);
+                    //Log.d("X Velocity", Float.toString(ball.xVelocity));
                 }
 
 
                 // Bounce the ball back when it hits the bottom of screen
                 if (ball.getRect().bottom > (screenY - screenY / 24) &&
                         !RectF.intersects(paddle1.getRect1(), ball.getRect())) {
-                    ball.reverseYVelocity();
-                    ball.clearObstacleY(screenY - screenY / 24 - 2);
-                    ball.lastPaddleHit=0;
+                    ball.reset(screenX, screenY, true);
+                    score1-=10;
 
 
 
@@ -292,22 +304,21 @@ public class LocalMultiplayer extends Activity {
 
                 // Bounce the ball back when it hits the top of screen
                 if (ball.getRect().top < (screenY / 24) && !RectF.intersects(ball.getRect(), paddle2.getRect2())) {
-                    ball.clearObstacleY(paddle2.getRect2().top + 25);
-                    ball.reverseYVelocity();
-                    ball.lastPaddleHit=0;
+                    ball.reset(screenX, screenY, false );
+                    score2-=10;
 
                 }
 
                 // If the ball hits left wall bounce
                 if (ball.getRect().left < 0) {
                     ball.reverseXVelocity();
-                    ball.clearObstacleX(1);
+                    ball.clearObstacleX(2);
                 }
 
                 // If the ball hits right wall bounce
                 if (ball.getRect().right > screenX) {
                     ball.reverseXVelocity();
-                    ball.clearObstacleX(screenX - 27);
+                    ball.clearObstacleX(screenX - ball.ballWidth);
 
                 }
             }
@@ -315,6 +326,10 @@ public class LocalMultiplayer extends Activity {
 
             if (numBricks==bricksInvisible){
                 paused=true;
+                TextView ScoreOne =(TextView) findViewById(R.id.Score1);
+                ScoreOne.setText(Integer.toString(score1));
+                TextView ScoreTwo =(TextView) findViewById(R.id.Score2);
+                ScoreTwo.setText(Integer.toString(score2));
                 startActivity(new Intent(LocalMultiplayer.this, LmGameOver.class));
             }
 
@@ -431,34 +446,93 @@ public class LocalMultiplayer extends Activity {
 
         @Override
         public boolean onTouchEvent(MotionEvent e) {
-
+            int index = e.getActionIndex();
+            int pointerId = e.getPointerId(index);
             switch (MotionEventCompat.getActionMasked(e)) {
+
                 case MotionEvent.ACTION_DOWN: {
                     paused=false;
                     final int pointerIndex = MotionEventCompat.getActionIndex(e);
                     // Remember where we started (for dragging)
                     mLastTouchX1 = MotionEventCompat.getX(e, pointerIndex);
                     activePointer = MotionEventCompat.getPointerId(e, 0);
-                    break;
+                    if(mVelocityTracker1 == null) {
+                        // Retrieve a new VelocityTracker object to watch the velocity of a motion.
+                        mVelocityTracker1 = VelocityTracker.obtain();
+                    }
+                    else {
+                        // Reset the velocity tracker back to its initial state.
+                        mVelocityTracker1.clear();
+                    }
+                    // Add a user's movement to the tracker.
+                    mVelocityTracker1.addMovement(e);
                 }
                 case MotionEvent.ACTION_MOVE: {
                     if (activePointer != INVALID_POINTER_ID) {
+                        mVelocityTracker1.addMovement(e);
+                        // When you want to determine the velocity, call
+                        // computeCurrentVelocity(). Then call getXVelocity()
+                        // and getYVelocity() to retrieve the velocity for each pointer ID.
+                        mVelocityTracker1.computeCurrentVelocity(1000);
+                        // Log velocity of pixels per second
+                        // Best practice to use VelocityTrackerCompat where possible.
+                        /*Log.d("123", "X velocity: " +
+                                VelocityTrackerCompat.getXVelocity(mVelocityTracker1,
+                                        pointerId));
+                        Log.d("345", "Y velocity: " +
+                                VelocityTrackerCompat.getYVelocity(mVelocityTracker1,
+                                        pointerId));*/
+
                         float x = MotionEventCompat.getX(e, activePointer);
                         float y = MotionEventCompat.getY(e, activePointer);
-                        float deltaX = x - mLastTouchX1;
-                        paddle1.update(deltaX, screenX, y, screenY);
-                        paddle2.update(deltaX, screenX, y, screenY);
+                        float deltaX = x - mLastTouchX1;if (y > screenY/2){
+                            paddle1.update(deltaX, screenX, y, screenY);
+                            xVelocityPaddle1 = (long) VelocityTrackerCompat.getXVelocity(mVelocityTracker1,
+                                    pointerId);
+
+                        }
+                        else {
+                            paddle2.update(deltaX, screenX, y, screenY);
+                            xVelocityPaddle2 = (long) VelocityTrackerCompat.getXVelocity(mVelocityTracker1,
+                                    pointerId);
+                        }
                         mLastTouchX1 = x;
+                        break;
+
                     }
                     if (newPointer == 1) {
                         final int pointerIndex = MotionEventCompat.findPointerIndex(e, newPointer);
+                        mVelocityTracker2.addMovement(e);
+                        // When you want to determine the velocity, call
+                        // computeCurrentVelocity(). Then call getXVelocity()
+                        // and getYVelocity() to retrieve the velocity for each pointer ID.
+                        mVelocityTracker2.computeCurrentVelocity(1000);
+                        // Log velocity of pixels per second
+                        // Best practice to use VelocityTrackerCompat where possible.
+                        /*Log.d("", "X velocity: " +
+                                VelocityTrackerCompat.getXVelocity(mVelocityTracker2,
+                                        pointerId));
+                        Log.d("", "Y velocity: " +
+                                VelocityTrackerCompat.getYVelocity(mVelocityTracker2,
+                                        pointerId));*/
 
                         float x = MotionEventCompat.getX(e, pointerIndex);
                         float y = MotionEventCompat.getY(e, pointerIndex);
                         float deltaX = x - mLastTouchX2;
-                        paddle1.update(deltaX, screenX, y, screenY);
-                        paddle2.update(deltaX, screenX, y, screenY);
+                        if (y > screenY/2){
+                            paddle1.update(deltaX, screenX, y, screenY);
+                            xVelocityPaddle1 = (long) VelocityTrackerCompat.getXVelocity(mVelocityTracker2,
+                                    pointerId);
+
+                        }
+                        else {
+                            paddle2.update(deltaX, screenX, y, screenY);
+                            xVelocityPaddle2 = (long) VelocityTrackerCompat.getXVelocity(mVelocityTracker2,
+                                    pointerId);
+                        }
                         mLastTouchX2 = x;
+
+                        break;
 
                     }
                     break;
@@ -468,21 +542,35 @@ public class LocalMultiplayer extends Activity {
                     if (newPointerIndex == 1) {
                         newPointer = MotionEventCompat.getPointerId(e, newPointerIndex);
                         mLastTouchX2 = MotionEventCompat.getX(e, newPointerIndex);
+                        if(mVelocityTracker2 == null) {
+                            // Retrieve a new VelocityTracker object to watch the velocity of a motion.
+                            mVelocityTracker2 = VelocityTracker.obtain();
+                        }
+                        else {
+                            // Reset the velocity tracker back to its initial state.
+                            mVelocityTracker2.clear();
+                        }
+                        // Add a user's movement to the tracker.
+                        mVelocityTracker2.addMovement(e);
                     }
                     break;
                 }
                 case MotionEvent.ACTION_UP: {
                     activePointer = INVALID_POINTER_ID;
+                    mVelocityTracker1.clear();
+
                     break;
                 }
 
                 case MotionEvent.ACTION_CANCEL: {
                     activePointer = INVALID_POINTER_ID;
+                    mVelocityTracker1.recycle();
                     break;
                 }
                 case MotionEvent.ACTION_POINTER_UP: {
                     if (newPointer == 1) {
                         newPointer = INVALID_POINTER_ID;
+                        mVelocityTracker2.clear();
                     }
                     break;
                 }
