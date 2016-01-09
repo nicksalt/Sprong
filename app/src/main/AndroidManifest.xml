@@ -11,7 +11,7 @@
         i
         <activity
             android:name=".LocalMultiplayer"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".MainMenu"
             android:screenOrientation="portrait"
@@ -25,9 +25,14 @@
         <activity
             android:name=".LmGameOver"
             android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen">
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" />
+        <activity
+            android:name=".BackgroundMessage"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" >
 
-        </activity>
+
+    </activity>
     </application>
 
 </manifest>

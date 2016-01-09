@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Sprong</string>
     <string name="title_activity_main_menu">MainMenu</string>
+
+    <string name="title_activity_background_message">BackgroundMessage</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>

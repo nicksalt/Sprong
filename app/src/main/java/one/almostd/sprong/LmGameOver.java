@@ -34,11 +34,13 @@ public class LmGameOver extends Activity {
         });
         if (score1 > score2){
             WinnerOne.setText("WINNER!");
+            WinnerTwo.setText("");
         }
-        if (score2<score1){
+        else if (score2 < score1){
+            WinnerTwo.setText("");
             WinnerTwo.setText("WINNER!");
         }
-        if (score1==score2){
+        else{
             WinnerOne.setText("TIE");
             WinnerTwo.setText("TIE");
 
