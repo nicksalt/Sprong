@@ -4,6 +4,7 @@ package one.almostd.sprong;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -21,7 +22,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.VelocityTracker;
 import android.view.WindowManager;
-import android.widget.TextView;
 
 
 public class LocalMultiplayer extends Activity {
@@ -110,6 +110,8 @@ public class LocalMultiplayer extends Activity {
         int fpsLow;
         int bricksInvisible;
 
+        SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+
 
         // When the we initialize (call new()) on gameView
         // This special constructor method runs
@@ -132,8 +134,6 @@ public class LocalMultiplayer extends Activity {
 
             screenX = size.x;
             screenY = size.y;
-            Log.d("X ", Integer.toString(screenX));
-            Log.d("Y ", Integer.toString(screenY));
             paddle1 = new Paddle(screenX, screenY);
             paddle2 = new Paddle(screenX, screenY);
 
@@ -319,15 +319,8 @@ public class LocalMultiplayer extends Activity {
 
                 }
             }
-
-
             if (numBricks==bricksInvisible){
-                paused=true;
-                TextView ScoreOne =(TextView) findViewById(R.id.Score1);
-                ScoreOne.setText(Integer.toString(score1));
-                TextView ScoreTwo =(TextView) findViewById(R.id.Score2);
-                ScoreTwo.setText(Integer.toString(score2));
-                startActivity(new Intent(LocalMultiplayer.this, LmGameOver.class));
+                endGame();
             }
 
         }
@@ -414,10 +407,21 @@ public class LocalMultiplayer extends Activity {
 
         }
 
+        public void endGame(){
+            paused=true;
+            SharedPreferences.Editor e = myPrefs.edit();
+            e.putInt("score1", score1); // add or overwrite someValue
+            e.putInt("score2", score2); // add or overwrite someValue
+            e.commit(); // this saves to disk and notifies observers
+            Log.d("Score 1 End", Integer.toString(myPrefs.getInt("score1", 0)));
+            startActivity(new Intent(LocalMultiplayer.this, LmGameOver.class));
+        }
+
         // If SimpleGameEngine Activity is paused/stopped
         // shutdown our thread.
         public void pause() {
             playing = false;
+            paused = true;
             try {
                 gameThread.join();
             } catch (InterruptedException e) {
@@ -440,6 +444,8 @@ public class LocalMultiplayer extends Activity {
         private static final int INVALID_POINTER_ID = -1;
         private int activePointer = INVALID_POINTER_ID;
         private int newPointer = INVALID_POINTER_ID;
+        private boolean bottomHalf1;
+        private boolean bottomHalf2;
 
         @Override
         public boolean onTouchEvent(MotionEvent e) {
@@ -452,6 +458,12 @@ public class LocalMultiplayer extends Activity {
                     final int pointerIndex = MotionEventCompat.getActionIndex(e);
                     // Remember where we started (for dragging)
                     mLastTouchX1 = MotionEventCompat.getX(e, pointerIndex);
+                    if (MotionEventCompat.getY(e, pointerIndex) > screenY/2){
+                        bottomHalf1 = true;
+                    }
+                    else{
+                        bottomHalf1=false;
+                    }
                     activePointer = MotionEventCompat.getPointerId(e, 0);
                     if(mVelocityTracker1 == null) {
                         // Retrieve a new VelocityTracker object to watch the velocity of a motion.
@@ -465,8 +477,9 @@ public class LocalMultiplayer extends Activity {
                     mVelocityTracker1.addMovement(e);
                 }
                 case MotionEvent.ACTION_MOVE: {
-                    Log.d("NewPointer", Integer.toString(newPointer));
-                    if (activePointer != INVALID_POINTER_ID) {
+                    if (activePointer == 0) {
+                        float x = MotionEventCompat.getX(e, 0);
+                        float deltaX = x - mLastTouchX1;
                         mVelocityTracker1.addMovement(e);
                         // When you want to determine the velocity, call
                         // computeCurrentVelocity(). Then call getXVelocity()
@@ -481,16 +494,15 @@ public class LocalMultiplayer extends Activity {
                                 VelocityTrackerCompat.getYVelocity(mVelocityTracker1,
                                         pointerId));*/
 
-                        float x = MotionEventCompat.getX(e, activePointer);
-                        float y = MotionEventCompat.getY(e, activePointer);
-                        float deltaX = x - mLastTouchX1;if (y > screenY/2){
-                            paddle1.update(deltaX, screenX, y, screenY);
+
+                        if (bottomHalf1){
+                            paddle1.update(deltaX, screenX,  bottomHalf1);
                             xVelocityPaddle1 = (long) VelocityTrackerCompat.getXVelocity(mVelocityTracker1,
                                     pointerId);
 
                         }
                         else {
-                            paddle2.update(deltaX, screenX, y, screenY);
+                            paddle2.update(deltaX, screenX, bottomHalf1);
                             xVelocityPaddle2 = (long) VelocityTrackerCompat.getXVelocity(mVelocityTracker1,
                                     pointerId);
                         }
@@ -498,8 +510,9 @@ public class LocalMultiplayer extends Activity {
                     }
 
                     if (newPointer == 1) {
-                        Log.d("Test", "Pointer");
                         final int pointerIndex = MotionEventCompat.findPointerIndex(e, newPointer);
+                        float x = MotionEventCompat.getX(e, pointerIndex);
+                        float deltaX = x - mLastTouchX2;
                         mVelocityTracker2.addMovement(e);
                         // When you want to determine the velocity, call
                         // computeCurrentVelocity(). Then call getXVelocity()
@@ -514,17 +527,15 @@ public class LocalMultiplayer extends Activity {
                                 VelocityTrackerCompat.getYVelocity(mVelocityTracker2,
                                         pointerId));*/
 
-                        float x = MotionEventCompat.getX(e, pointerIndex);
-                        float y = MotionEventCompat.getY(e, pointerIndex);
-                        float deltaX = x - mLastTouchX2;
-                        if (y > screenY/2){
-                            paddle1.update(deltaX, screenX, y, screenY);
+
+                        if (bottomHalf2){
+                            paddle1.update(deltaX, screenX, bottomHalf2);
                             xVelocityPaddle1 = (long) VelocityTrackerCompat.getXVelocity(mVelocityTracker2,
                                     pointerId);
 
                         }
                         else {
-                            paddle2.update(deltaX, screenX, y, screenY);
+                            paddle2.update(deltaX,screenX, bottomHalf2);
                             xVelocityPaddle2 = (long) VelocityTrackerCompat.getXVelocity(mVelocityTracker2,
                                     pointerId);
                         }
@@ -538,8 +549,13 @@ public class LocalMultiplayer extends Activity {
                     int newPointerIndex = MotionEventCompat.getActionIndex(e);
                     if (newPointerIndex == 1) {
                         newPointer = MotionEventCompat.getPointerId(e, newPointerIndex);
-                        Log.d("New Pointer ", Integer.toString(newPointer));
                         mLastTouchX2 = MotionEventCompat.getX(e, newPointerIndex);
+                        if (MotionEventCompat.getY(e, pointerId) > screenY/2){
+                            bottomHalf2 = true;
+                        }
+                        else{
+                            bottomHalf2=false;
+                        }
                         if(mVelocityTracker2 == null) {
                             // Retrieve a new VelocityTracker object to watch the velocity of a motion.
                             mVelocityTracker2 = VelocityTracker.obtain();
@@ -555,6 +571,7 @@ public class LocalMultiplayer extends Activity {
                 }
                 case MotionEvent.ACTION_UP: {
                     activePointer = INVALID_POINTER_ID;
+                    mLastTouchX1=0;
                     mVelocityTracker1.clear();
 
                     break;
@@ -568,6 +585,7 @@ public class LocalMultiplayer extends Activity {
                 case MotionEvent.ACTION_POINTER_UP: {
                     if (newPointer == 1) {
                         newPointer = INVALID_POINTER_ID;
+                        mLastTouchX2=0;
                         mVelocityTracker2.clear();
                     }
                     break;
@@ -582,7 +600,6 @@ public class LocalMultiplayer extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("Testing", "Resume");
 
         // Tell the gameView resume method to execute
         localMultiplayerView.resume();
@@ -595,7 +612,7 @@ public class LocalMultiplayer extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d("Testing: ", "Pause");
+
 
         // Tell the gameView pause method to execute
         localMultiplayerView.pause();

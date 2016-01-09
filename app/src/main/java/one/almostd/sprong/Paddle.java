@@ -57,8 +57,8 @@ public class Paddle {
 
 
 
-    public void update ( float x, int screenX, float y, int screenY){
-        if (y > screenY / 2){
+    public void update ( float x, int screenX, boolean bottomHalf){
+        if (bottomHalf){
             rect1.left = rect1.left + x;
             rect1.right = rect1.left + length;
             if (rect1.left < 0 ){
