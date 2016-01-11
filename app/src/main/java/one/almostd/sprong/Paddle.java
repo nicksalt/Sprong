@@ -1,7 +1,6 @@
 package one.almostd.sprong;
 
 import android.graphics.RectF;
-import android.util.Log;
 
 /**
  * Created by Nick on 2015-12-01.
@@ -25,7 +24,6 @@ public class Paddle {
     public Paddle(int screenX, int screenY, int y, boolean bottom) {
         length = (float)(screenX/4.25);
         height = screenY/50;
-        Log.d("ScreenX ", Integer.toString(screenX));
 
         // Start paddle in roughly the screen centre
         x = ((int)((screenX / 2) - (length/2)));

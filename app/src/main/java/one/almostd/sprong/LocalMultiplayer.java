@@ -15,7 +15,6 @@ import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.VelocityTrackerCompat;
-import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -296,7 +295,7 @@ public class LocalMultiplayer extends Activity {
                 if (ball.getRect().bottom > (screenY - screenY / 24) &&
                         !RectF.intersects(paddle1.getRect(), ball.getRect())) {
                     ball.reset(screenX, screenY, true);
-                    score1-=10;
+                    score2+=10;
 
 
 
@@ -306,7 +305,7 @@ public class LocalMultiplayer extends Activity {
                 // Bounce the ball back when it hits the top of screen
                 if (ball.getRect().top < (screenY / 24) && !RectF.intersects(ball.getRect(), paddle2.getRect())) {
                     ball.reset(screenX, screenY, false );
-                    score2-=10;
+                    score1+=10;
 
                 }
 
@@ -323,6 +322,8 @@ public class LocalMultiplayer extends Activity {
 
                 }
             }
+
+
             if (numBricks==bricksInvisible){
                 endGame();
             }
@@ -337,6 +338,7 @@ public class LocalMultiplayer extends Activity {
             if (ourHolder.getSurface().isValid()) {
                 // Lock the canvas ready to draw
                 canvas = ourHolder.lockCanvas();
+
                 if (fpsBackground) {
                     RectF dest = new RectF(0, 0, getWidth(), getHeight());
                     paint.setFilterBitmap(true);
@@ -397,6 +399,19 @@ public class LocalMultiplayer extends Activity {
                         canvas.drawRect(bricks[i].getRect(), paint);
                     }
                 }
+                if (paused){
+                    Paint textPaint = new Paint();
+                    textPaint.setTextSize(100);
+                    textPaint.setColor(Color.WHITE);
+
+                    int xPos = (int)(canvas.getWidth() / 14.4);
+                    int yPos = screenY/2 + (3* screenX / 25) ;
+                    canvas.rotate(270, xPos, yPos);
+                    //((textPaint.descent() + textPaint.ascent()) / 2) is the distance from the baseline to the center.
+
+                    canvas.drawText("Paused", xPos, yPos, textPaint);
+                    canvas.rotate(90, xPos, yPos);
+                }
 
                 paint.setTextSize((int)(canvas.getHeight()/22.5));
                 canvas.drawText("Score: " + " " + Integer.toString(score1), 10, screenY - 10, paint);
@@ -417,7 +432,6 @@ public class LocalMultiplayer extends Activity {
             e.putInt("score1", score1); // add or overwrite someValue
             e.putInt("score2", score2); // add or overwrite someValue
             e.apply(); // this saves to disk and notifies observers
-            Log.d("Score 1 End", Integer.toString(myPrefs.getInt("score1", 0)));
             startActivity(new Intent(LocalMultiplayer.this, LmGameOver.class));
         }
 
@@ -429,7 +443,6 @@ public class LocalMultiplayer extends Activity {
             try {
                 gameThread.join();
             } catch (InterruptedException e) {
-                Log.e("Error:", "joining thread");
             }
 
         }
@@ -463,12 +476,7 @@ public class LocalMultiplayer extends Activity {
                     // Remember where we started (for dragging)
                     mLastTouchX1 = MotionEventCompat.getX(e, index);
                     primaryPointer = pointerId;
-                    if (MotionEventCompat.getY(e, index) > screenY/2){
-                        touch1Bottom = true;
-                    }
-                    else{
-                        touch1Bottom = false;
-                    }
+                    touch1Bottom = MotionEventCompat.getY(e, index) > screenY / 2;
                     if(mVelocityTracker1 == null) {
                         // Retrieve a new VelocityTracker object to watch the velocity of a motion.
                         mVelocityTracker1 = VelocityTracker.obtain();
@@ -487,12 +495,7 @@ public class LocalMultiplayer extends Activity {
                         // Remember where we started (for dragging)
                         mLastTouchX1 = MotionEventCompat.getX(e, index);
                         primaryPointer = pointerId;
-                        if (MotionEventCompat.getY(e, index) > screenY/2){
-                            touch1Bottom = true;
-                        }
-                        else{
-                            touch1Bottom = false;
-                        }
+                        touch1Bottom = MotionEventCompat.getY(e, index) > screenY / 2;
                         if(mVelocityTracker1 == null) {
                             // Retrieve a new VelocityTracker object to watch the velocity of a motion.
                             mVelocityTracker1 = VelocityTracker.obtain();
@@ -510,12 +513,7 @@ public class LocalMultiplayer extends Activity {
                         // Remember where we started (for dragging)
                         mLastTouchX2 = MotionEventCompat.getX(e, index);
                         secondPointer = pointerId;
-                        if (MotionEventCompat.getY(e, index) > screenY/2){
-                            touch2Bottom = true;
-                        }
-                        else{
-                            touch2Bottom = false;
-                        }
+                        touch2Bottom = MotionEventCompat.getY(e, index) > screenY / 2;
                         if(mVelocityTracker2 == null) {
                             // Retrieve a new VelocityTracker object to watch the velocity of a motion.
                             mVelocityTracker2 = VelocityTracker.obtain();
@@ -544,14 +542,7 @@ public class LocalMultiplayer extends Activity {
                 }
 
                 case MotionEvent.ACTION_CANCEL: {
-                    if (pointerId == 0){
-                        primaryPointer = INVALID_POINTER_ID;
-                        mVelocityTracker1.recycle();
-                    }
-                    if (pointerId == 1){
-                        mVelocityTracker2.recycle();
-                        secondPointer = INVALID_POINTER_ID;
-                    }
+
                     break;
                 }
 
@@ -662,6 +653,12 @@ public class LocalMultiplayer extends Activity {
 
         // Tell the gameView pause method to execute
         localMultiplayerView.pause();
+    }
+
+    //Back Button Pressed on device
+    @Override
+    public void onBackPressed(){
+        localMultiplayerView.paused=true;
     }
 }
 

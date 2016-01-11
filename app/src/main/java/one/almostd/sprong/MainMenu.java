@@ -3,12 +3,11 @@ package one.almostd.sprong;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
-
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
 public class MainMenu extends Activity {
 
     @Override
@@ -17,13 +16,28 @@ public class MainMenu extends Activity {
 
         setContentView(R.layout.activity_main_menu);
 
-        final Button button = (Button) findViewById(R.id.PlayButton);
-        button.setOnClickListener(new View.OnClickListener() {
+        final Button playButton = (Button) findViewById(R.id.PlayButton);
+        playButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Perform action on click
                 startActivity(new Intent(MainMenu.this, LocalMultiplayer.class));
             }
         });
+
+        final Button controlsButton = (Button) findViewById(R.id.Controls);
+        controlsButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Perform action on click
+                startActivity(new Intent(MainMenu.this, Controls.class));
+            }
+        });
+        AdView adViewBottom = (AdView) findViewById(R.id.menuBottomAdView);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .addTestDevice("02157df28d874504")
+                .addTestDevice("T416A3A414730")
+                .build();
+        adViewBottom.loadAd(adRequest);
     }
 
 

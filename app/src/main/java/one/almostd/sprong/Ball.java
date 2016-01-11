@@ -18,18 +18,18 @@ public class Ball {
 
 
     public Ball(int screenX, int screenY, int player){
-        ballWidth = screenX/36;
-        ballHeight = screenX/36;
-        x = screenX/2 ;
+        ballWidth = screenX/25;
+        ballHeight = screenX/25;
+        x = screenX/2 - (ballWidth / 2) ;
         if (player == 1) {
             y = (float) (screenY - screenY / 4.5);
             xVelocity = 200;
-            yVelocity = 500;
+            yVelocity = 600;
         }
         else {
             y = (float) (screenY / 4.5);
             xVelocity = -200;
-            yVelocity = -500;
+            yVelocity = -600;
         }
         rect = new RectF(x , y, x + ballWidth, y + ballHeight);
         // Start the ball travelling straight up at 100 pixels per second
@@ -77,12 +77,13 @@ public class Ball {
         rect.left = x / 2;
         if (top){
             rect.top = (float) (y/4.5);
+            xVelocity = -200;
         }
         else {
             rect.top = (float) (y - y / 4.5);
+            xVelocity=200;
         }
         yVelocity=-yVelocity;
-        xVelocity=200;
         rect.right = rect.left + ballWidth;
         rect.bottom = rect.top - ballHeight;
     }
