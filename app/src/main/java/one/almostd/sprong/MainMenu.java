@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 public class MainMenu extends Activity {
 
@@ -32,11 +31,7 @@ public class MainMenu extends Activity {
             }
         });
         AdView adViewBottom = (AdView) findViewById(R.id.menuBottomAdView);
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                .addTestDevice("02157df28d874504")
-                .addTestDevice("T416A3A414730")
-                .build();
+        AdRequest adRequest = new AdRequest.Builder().build();
         adViewBottom.loadAd(adRequest);
     }
 

@@ -21,6 +21,7 @@ public class BackgroundMessage extends Activity {
             public void onClick(View v) {
                 // Perform action on click
                 startActivity(new Intent(BackgroundMessage.this, MainMenu.class));
+                finish();
             }
         });
     }

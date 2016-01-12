@@ -14,22 +14,23 @@ public class Ball {
     public float y;
     float ballWidth;
     float ballHeight;
-    public int lastPaddleHit;
+    public int lastPaddleHit = 0;
+    public boolean isVisible = true;
 
 
     public Ball(int screenX, int screenY, int player){
-        ballWidth = screenX/25;
-        ballHeight = screenX/25;
+        ballWidth = screenX/22;
+        ballHeight = screenX/22;
         x = screenX/2 - (ballWidth / 2) ;
         if (player == 1) {
             y = (float) (screenY - screenY / 4.5);
-            xVelocity = 200;
-            yVelocity = 600;
+            xVelocity = (int) (screenX/7.2);
+            yVelocity = screenY/3;
         }
         else {
             y = (float) (screenY / 4.5);
-            xVelocity = -200;
-            yVelocity = -600;
+            xVelocity = - (int) (screenX/7.2);
+            yVelocity = - screenY/4;
         }
         rect = new RectF(x , y, x + ballWidth, y + ballHeight);
         // Start the ball travelling straight up at 100 pixels per second
@@ -44,7 +45,6 @@ public class Ball {
     public RectF getRect(){
         return rect;
     }
-
 
     public void update(long fps){
         rect.left = rect.left + (xVelocity / fps );
@@ -73,15 +73,15 @@ public class Ball {
         rect.right = rect.left + ballWidth;
     }
 
-    public void reset(int x, int y, boolean top){
+    public void reset( int x, int y, boolean top){
         rect.left = x / 2;
         if (top){
             rect.top = (float) (y/4.5);
-            xVelocity = -200;
+            xVelocity = - (int) (x/7.2);
         }
         else {
             rect.top = (float) (y - y / 4.5);
-            xVelocity=200;
+            xVelocity= (int) (x/7.2);
         }
         yVelocity=-yVelocity;
         rect.right = rect.left + ballWidth;

@@ -7,33 +7,21 @@
     android:baselineAligned="false"
     android:background="@drawable/deepfield16x9">
 
-    <TextView
-        android:id="@+id/Score1"
 
 
-        android:textColor="#FFFF"
-        android:textSize="96sp"
-
-
-
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/Crown1"
         android:background="@android:color/transparent"
-        android:text="100"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 
-    <TextView
-        android:id="@+id/Score2"
+    <ImageView
         android:rotation="180"
-        android:text="100"
-
-
-        android:textColor="#FFFF"
-        android:textSize="96sp"
-
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/Crown2"
         android:background="@android:color/transparent"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
@@ -42,34 +30,83 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#FFFF"
-        android:background="@android:color/transparent"
+        android:background="@drawable/button_border"
         android:textSize="50sp"
         android:text="NEW GAME"
         android:id="@+id/NewGame"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:id="@+id/Winner2"
-        android:rotation="180"
-        android:textSize="40dp"
-        android:text="WINNER!"
-        android:layout_below="@+id/Score2"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="5dp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:id="@+id/Winner1"
-        android:textSize="40dp"
-        android:text="WINNER"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="70dp"
         android:layout_above="@+id/Score1"
         android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFF"
+        android:background="@drawable/button_border"
+        android:textSize="50sp"
+        android:text="MAIN MENU"
+        android:id="@+id/MainMenu"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFF"
+        android:background="@drawable/button_border"
+        android:textSize="50sp"
+        android:text="NEXT GAME"
+        android:id="@+id/NextGame"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="70dp"
+        android:layout_below="@+id/Score2" />
+
+    <TextView
+        android:id="@+id/Score1"
+        android:textColor="#FFFF"
+        android:textSize="80sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:text=""
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:id="@+id/Score2"
+        android:rotation="180"
+        android:text=""
+        android:textColor="#FFFF"
+        android:textSize="80sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textColor="@android:color/white"
+        android:textSize="25sp"
+        android:background="@color/Black"
+        android:id="@+id/RoundsWon1"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:rotation="180"
+        android:textColor="@android:color/white"
+        android:textSize="25sp"
+        android:background="@color/Black"
+        android:id="@+id/RoundsWon2"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true" />
+
 
 </RelativeLayout>

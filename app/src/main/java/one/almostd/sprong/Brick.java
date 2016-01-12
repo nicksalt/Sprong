@@ -14,17 +14,17 @@ public class Brick {
     private boolean isVisible;
     private int randomColour;
 
-    public Brick(int row, int column, int width, int height){
+    public Brick(int screenX, int row, int column, int width, int height){
 
         isVisible = true;
 
-        int padding = 15;
+        int padding = screenX/120;
 
         rect = new RectF(column * width + padding,
                 row * height + padding,
                 column * width + width - padding,
                 row * height + height - padding);
-        randomColour = r.nextInt(5);
+        randomColour = r.nextInt(10);
     }
 
     public RectF getRect(){

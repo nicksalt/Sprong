@@ -4,6 +4,12 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="Black">#FF000000</color>
-
     <color name="black_overlay">#66000000</color>
+    <color name="orange">#FF8000</color>
+    <color name="dark_green">#009933</color>
+    <color name="light_blue">#00FFFF</color>
+    <color name="purple">#9A2EFE</color>
+    <color name="dark_pink">#DF0174</color>
+    <color name="st_theresa_blue">#13233F</color>
+    <color name="st_theresa_burgundy">#82054D</color>
 </resources>

@@ -70,6 +70,9 @@ public class LocalMultiplayer extends Activity {
         public int screenX;
         public int screenY;
 
+        int gameTop;
+        int gameBottom;
+
         private float mLastTouchX1;
         private float mLastTouchX2;
 
@@ -84,26 +87,29 @@ public class LocalMultiplayer extends Activity {
 
         Bitmap background;
 
+        Bitmap multiball;
+        Bitmap smallPaddle;
+        Bitmap largePaddle;
+        Bitmap reversePaddle;
+        Bitmap bullet;
+
 
 
 
         // A ball
-        Ball[] balls = new Ball[10];
+        Ball[] balls = new Ball[72];
         int numBalls;
 
         // Up to 200 bricks
         Brick[] bricks = new Brick[72];
         int numBricks;
+
+        PowerUp[] powerUps = new PowerUp[72];
+        int numPowerUps;
         // The score
         public int score1;
         public int score2;
 
-
-        RectF leftPause1 = new RectF((float) (screenX*.76), screenY - screenY/24,(float) (screenX*.79), screenY);
-        RectF rightPause1 = new RectF((float) (screenX*.81), screenY - screenY/24,(float) (screenX*.84), screenY);
-
-        RectF leftPause2 = new RectF((float) (screenX*.16), screenY/24,(float) (screenX*.19), 0);
-        RectF rightPause2 = new RectF((float) (screenX*.21), screenY/24,(float) (screenX*.24), 0);
         SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
         boolean fpsBackground = myPrefs.getBoolean("fpsBackground", true);
         int fpsLow;
@@ -122,7 +128,7 @@ public class LocalMultiplayer extends Activity {
             // Initialize ourHolder and paint objects
             ourHolder = getHolder();
             paint = new Paint();
-            background = BitmapFactory.decodeResource(this.getResources(), R.drawable.deepfield16x9);
+
             // Get a Display object to access screen details
             Display display = getWindowManager().getDefaultDisplay();
             // Load the resolution into a Point object
@@ -133,13 +139,26 @@ public class LocalMultiplayer extends Activity {
 
             screenX = size.x;
             screenY = size.y;
-            paddle1 = new Paddle(screenX, screenY, screenY-screenY/24, true);
-            paddle2 = new Paddle(screenX, screenY, screenY/24, false);
+
+            gameTop = screenY / 10;
+            gameBottom = screenY - screenY/10;
+            paddle1 = new Paddle(screenX, screenY, gameBottom, true);
+            paddle2 = new Paddle(screenX, screenY, gameTop, false);
 
 
 
-
+            imageDownloader();
             createBricksAndRestart();
+
+        }
+
+        public void imageDownloader() {
+            background = BitmapFactory.decodeResource(this.getResources(), R.drawable.deepfield16x9);
+            multiball = BitmapFactory.decodeResource(this.getResources(), R.drawable.powerup);
+            smallPaddle = BitmapFactory.decodeResource(this.getResources(), R.drawable.smallpaddle);
+            largePaddle = BitmapFactory.decodeResource(this.getResources(), R.drawable.largepaddle);
+            reversePaddle = BitmapFactory.decodeResource(this.getResources(), R.drawable.reverse);
+            bullet = BitmapFactory.decodeResource(this.getResources(), R.drawable.bullet);
 
         }
 
@@ -158,7 +177,8 @@ public class LocalMultiplayer extends Activity {
             numBricks = 0;
             for (int column = 2; column < 8; column++) {
                 for (int row = 7; row < 19; row++) {
-                    bricks[numBricks] = new Brick(row, column, brickWidth, brickHeight);
+                    bricks[numBricks] = new Brick(screenX, row, column, brickWidth, brickHeight);
+
                     numBricks++;
                 }
             }
@@ -212,116 +232,15 @@ public class LocalMultiplayer extends Activity {
         }
 
         public void update() {
-
-
-
+            //Always update the ball
             for (int i = 0; i < numBalls; i++) {
                 balls[i].update(fps);
             }
 
             // Check for ball colliding with a brick
-            for (int i = 0; i < numBricks; i++) {
-                brickloop:
-                if (bricks[i].getVisibility()) {
-                    for (int k = 0; k < numBalls; k++){
-                        Ball ball = balls[k];
-                        //if (RectF.intersects(ball.getRect(), bricks[i].getRect())) {
-                            Point top = new Point((int)ball.getRect().centerX(),(int)ball.getRect().top);
-                            Point bottom = new Point((int)ball.getRect().centerX(),(int)ball.getRect().bottom);
-                            Point right = new Point((int)ball.getRect().right ,(int)ball.getRect().centerY());
-                            Point left = new Point((int)ball.getRect().left ,(int)ball.getRect().centerY());
-
-                            if (bricks[i].getRect().contains(top.x,top.y) ||
-                                    bricks[i].getRect().contains(bottom.x,bottom.y)) {
-                                ball.reverseYVelocity();
-                                bricks[i].setInvisible();
-                                switch (ball.lastPaddleHit){
-                                    case 1:
-                                        score1+=10;
-                                        break;
-                                    case 2:
-                                        score2+=10;
-                                        break;
-                                    default:
-                                        break;
-                                }
-                                bricksInvisible+=1;
-                                break brickloop;
-                            }
-
-                            if (bricks[i].getRect().contains(right.x,right.y) ||
-                                    bricks[i].getRect().contains(left.x,left.y)){
-                                ball.reverseXVelocity();
-                                bricks[i].setInvisible();
-                                switch (ball.lastPaddleHit){
-                                    case 1:
-                                        score1+=10;
-                                        break;
-                                    case 2:
-                                        score2+=10;
-                                        break;
-                                    default:
-                                        break;
-                                }
-                                bricksInvisible+=1;
-                                break brickloop;
-                            }
-
-                        //}
-                    }
-                }
-            }
-            for (int k = 0; k < numBalls; k++) {
-                Ball ball = balls[k];
-
-
-                // Check for ball colliding with paddle 1
-                if (RectF.intersects(paddle1.getRect(), ball.getRect())) {
-                    ball.reverseYVelocity();
-                    ball.clearObstacleY(paddle1.getRect().top);
-                    ball.lastPaddleHit = 1;
-                    ball.xVelocity += (xVelocity1/20);
-                }
-
-                if (RectF.intersects(paddle2.getRect(), ball.getRect())) {
-                    ball.reverseYVelocity();
-                    ball.clearObstacleY(paddle2.getRect().bottom + ball.ballHeight);
-                    ball.lastPaddleHit = 2;
-                    ball.xVelocity += (xVelocity2/20);
-                }
-
-
-                // Bounce the ball back when it hits the bottom of screen
-                if (ball.getRect().bottom > (screenY - screenY / 24) &&
-                        !RectF.intersects(paddle1.getRect(), ball.getRect())) {
-                    ball.reset(screenX, screenY, true);
-                    score2+=10;
-
-
-
-
-                }
-
-                // Bounce the ball back when it hits the top of screen
-                if (ball.getRect().top < (screenY / 24) && !RectF.intersects(ball.getRect(), paddle2.getRect())) {
-                    ball.reset(screenX, screenY, false );
-                    score1+=10;
-
-                }
-
-                // If the ball hits left wall bounce
-                if (ball.getRect().left < 0) {
-                    ball.reverseXVelocity();
-                    ball.clearObstacleX(2);
-                }
-
-                // If the ball hits right wall bounce
-                if (ball.getRect().right > screenX) {
-                    ball.reverseXVelocity();
-                    ball.clearObstacleX(screenX - ball.ballWidth);
-
-                }
-            }
+            ballCollision();
+            brickCollision();
+            powerUpUpdate();
 
 
             if (numBricks==bricksInvisible){
@@ -329,6 +248,220 @@ public class LocalMultiplayer extends Activity {
             }
 
         }
+
+        public void brickCollision(){
+            for (int i = 0; i < numBricks; i++) {
+                brickloop:
+                if (bricks[i].getVisibility()) {
+                    for (int k = 0; k < numBalls; k++) {
+                        Ball ball = balls[k];
+                        //if (RectF.intersects(ball.getRect(), bricks[i].getRect())) {
+                        Point top = new Point((int) ball.getRect().centerX(), (int) ball.getRect().top);
+                        Point bottom = new Point((int) ball.getRect().centerX(), (int) ball.getRect().bottom);
+                        Point right = new Point((int) ball.getRect().right, (int) ball.getRect().centerY());
+                        Point left = new Point((int) ball.getRect().left, (int) ball.getRect().centerY());
+
+                        if (bricks[i].getRect().contains(top.x, top.y) ||
+                                bricks[i].getRect().contains(bottom.x, bottom.y)) {
+                            ball.reverseYVelocity();
+                            bricks[i].setInvisible();
+                            switch (ball.lastPaddleHit) {
+                                case 1:
+                                    score1 += 10;
+                                    break;
+                                case 2:
+                                    score2 += 10;
+                                    break;
+                                default:
+                                    break;
+                            }
+                            bricksInvisible += 1;
+                            if (bricks[i].getRandommColour() == 0) {
+                                powerUps[numPowerUps] = new PowerUp(screenY,bricks[i].getRect().left,
+                                        bricks[i].getRect().top, ball.lastPaddleHit, multiball,
+                                        smallPaddle, largePaddle, reversePaddle, bullet);
+                                numPowerUps += 1;
+                            }
+
+                            break brickloop;
+                        }
+
+                        if (bricks[i].getRect().contains(right.x, right.y) ||
+                                bricks[i].getRect().contains(left.x, left.y)) {
+                            ball.reverseXVelocity();
+                            bricks[i].setInvisible();
+                            switch (ball.lastPaddleHit) {
+                                case 1:
+                                    score1 += 10;
+                                    break;
+                                case 2:
+                                    score2 += 10;
+                                    break;
+                                default:
+                                    break;
+                            }
+                            bricksInvisible += 1;
+                            if (bricks[i].getRandommColour() == 0) {
+                                powerUps[numPowerUps] = new PowerUp(screenY, bricks[i].getRect().left,
+                                        bricks[i].getRect().top, ball.lastPaddleHit, multiball,
+                                        smallPaddle, largePaddle, reversePaddle, bullet);
+
+                                numPowerUps += 1;
+                            }
+                            break brickloop;
+                        }
+
+                    }
+                }
+            }
+        }
+
+        public void ballCollision () {
+            for (int k = 0; k < numBalls; k++) {
+                Ball ball = balls[k];
+                if (ball.isVisible) {
+
+
+                    // Check for ball colliding with paddle 1
+                    if (RectF.intersects(paddle1.getRect(), ball.getRect())) {
+                        ball.reverseYVelocity();
+                        ball.clearObstacleY(paddle1.getRect().top);
+                        ball.lastPaddleHit = 1;
+                        ball.xVelocity += (xVelocity1 / 15);
+                    }
+
+                    if (RectF.intersects(paddle2.getRect(), ball.getRect())) {
+                        ball.reverseYVelocity();
+                        ball.clearObstacleY(paddle2.getRect().bottom + ball.ballHeight);
+                        ball.lastPaddleHit = 2;
+                        ball.xVelocity += (xVelocity2 / 15);
+                    }
+
+
+                    // Bounce the ball back when it hits the bottom of screen
+                    if (ball.getRect().bottom > gameBottom &&
+                            !RectF.intersects(paddle1.getRect(), ball.getRect())) {
+                        ball.reset(screenX, screenY, true);
+                        score2 += 10;
+                        if (k > 1) {
+                            ball.isVisible = false;
+                        }
+
+                    }
+
+                    // Bounce the ball back when it hits the top of screen
+                    if (ball.getRect().top < gameTop &&
+                            !RectF.intersects(ball.getRect(), paddle2.getRect())) {
+                        ball.reset(screenX, screenY, false);
+                        score1 += 10;
+
+                    }
+
+                    // If the ball hits left wall bounce
+                    if (ball.getRect().left < 0) {
+                        ball.reverseXVelocity();
+                        ball.clearObstacleX(2);
+                    }
+
+                    // If the ball hits right wall bounce
+                    if (ball.getRect().right > screenX) {
+                        ball.reverseXVelocity();
+                        ball.clearObstacleX(screenX - ball.ballWidth);
+
+                    }
+                }
+            }
+        }
+
+        public void powerUpUpdate() {
+            for (int i = 0; i < numPowerUps; i++) {
+                PowerUp powerUp = powerUps[i];
+                if (powerUp.getVisibilty()) {
+                    powerUp.update(fps);
+                    if (paddle1.getRect().contains(powerUp.getCenterX(), powerUp.getBottomY())) {
+                        powerUp.invisible();
+                        powerUp.activate(System.currentTimeMillis());
+                        if (paddle2.getRect().contains(powerUp.getCenterX(), powerUp.getY())) {
+                            powerUp.invisible();
+                            powerUp.activate(System.currentTimeMillis());
+                        }
+                        if (powerUp.getBottomY() > gameBottom) {
+                            powerUp.invisible();
+                        }
+
+                        if (powerUp.getY() < gameTop) {
+                            powerUp.invisible();
+                        }
+                    }
+                    activatePowerUp(powerUp);
+                }
+            }
+        }
+        public void activatePowerUp(PowerUp powerUp){
+            if (powerUp.isActive) {
+                long startTime = powerUp.getActivateTime();
+                switch (powerUp.getPowerUpNum()) {
+                    case 1: { //small paddle
+                        if (powerUp.paddle == 1) {
+                            paddle1.setPaddleShrink();
+                            if (System.currentTimeMillis() - startTime >= 5000) {
+                                paddle1.paddleShrinkReset();
+                                powerUp.isActive = false;
+                            }
+                        }
+                        else {
+                            paddle2.setPaddleShrink();
+                            if (System.currentTimeMillis() - startTime >= 5000) {
+                                paddle2.paddleShrinkReset();
+                                powerUp.isActive = false;
+                            }
+                        }
+                        break;
+                    }
+                    case 2: {
+                        if (powerUp.paddle == 1) {
+                            paddle1.setPaddleGrow();
+                            if (System.currentTimeMillis() - startTime >= 5000) {
+                                paddle1.setPaddleGrowReset();
+                                powerUp.isActive = false;
+                            }
+                        } else {
+                            paddle2.setPaddleGrow();
+                            if (System.currentTimeMillis() - startTime >= 5000) {
+                                paddle2.setPaddleGrowReset();
+                                powerUp.isActive = false;
+                            }
+                        }
+                        break;
+                    }
+                    case 3: {
+                        if (powerUp.paddle == 1) {
+                            paddle1.reversePaddle = true;
+                            if (System.currentTimeMillis() - startTime >= 5000) {
+                                paddle1.reversePaddle = false;
+                                powerUp.isActive = false;
+                            }
+                            break;
+                        }
+                        else {
+                            paddle2.reversePaddle = true;
+                            if (System.currentTimeMillis() - startTime >= 5000) {
+                                paddle2.reversePaddle = false;
+                                powerUp.isActive = false;
+                            }
+                            break;
+                        }
+                    }
+                    case 0: {
+                        balls[numBalls] = new Ball(screenX, screenY, powerUp.paddle);
+                        numBalls++;
+                        powerUp.isActive=false;
+
+                    }
+                }
+            }
+        }
+
 
         // Draw the newly updated scene
         public void draw() {
@@ -350,11 +483,7 @@ public class LocalMultiplayer extends Activity {
 
                 paint.setColor(Color.BLUE);
                 paint.setTextSize(24);
-                canvas.drawText("Fps: " + " " + Float.toString(fps), 10, 50, paint);
-                canvas.drawRect(leftPause1, paint);
-                canvas.drawRect(rightPause1, paint);
-                canvas.drawRect(leftPause2, paint);
-                canvas.drawRect(rightPause2, paint);
+
 
                 // Draw the paddle
                 canvas.drawRect(paddle1.getRect(), paint);
@@ -367,11 +496,13 @@ public class LocalMultiplayer extends Activity {
                 // Draw the ball
                 for (int k = 0; k < numBalls; k++) {
                     Ball ball = balls[k];
-                    canvas.drawOval(ball.getRect(), paint);
+                    if (ball.isVisible) {
+                        canvas.drawOval(ball.getRect(), paint);
+                    }
                 }
                 //draw lines for touch area
-                canvas.drawLine(0, (float) (screenY - (screenY / 24)), screenX, ((float) (screenY - (screenY / 24))), paint);
-                canvas.drawLine(0, (float) (screenY / 24), screenX, (float) (screenY / 24), paint);
+                canvas.drawLine(0, gameBottom, screenX, gameBottom, paint);
+                canvas.drawLine(0, gameTop, screenX, gameTop, paint);
 
 
 
@@ -391,12 +522,33 @@ public class LocalMultiplayer extends Activity {
                                 paint.setColor(Color.MAGENTA);
                                 break;
                             case 4:
-                                paint.setColor(Color.YELLOW);
+                                paint.setColor(Color.RED);
+                                break;
+                            case 5:
+                                paint.setColor(getResources().getColor(R.color.orange));
+                                break;
+                            case 6:
+                                paint.setColor(getResources().getColor(R.color.dark_green));
+                                break;
+                            case 7:
+                                paint.setColor(getResources().getColor(R.color.light_blue));
+                                break;
+                            case 8:
+                                paint.setColor(getResources().getColor(R.color.purple));
+                                break;
+                            case 9:
+                                paint.setColor(getResources().getColor(R.color.dark_pink));
                                 break;
                             default:
-                                paint.setColor(Color.RED);
+                                paint.setColor(Color.YELLOW);
                         }
                         canvas.drawRect(bricks[i].getRect(), paint);
+                    }
+                }
+                for (int i = 0; i<numPowerUps; i++){
+                    PowerUp powerUp = powerUps[i];
+                    if(powerUp.getVisibilty()) {
+                        canvas.drawBitmap(powerUp.getPowerUp(), powerUp.getX(), powerUp.getY(), paint);
                     }
                 }
                 if (paused){
@@ -413,10 +565,10 @@ public class LocalMultiplayer extends Activity {
                     canvas.rotate(90, xPos, yPos);
                 }
 
-                paint.setTextSize((int)(canvas.getHeight()/22.5));
-                canvas.drawText("Score: " + " " + Integer.toString(score1), 10, screenY - 10, paint);
+                paint.setTextSize(canvas.getHeight()/20);
+                canvas.drawText(Integer.toString(score1), 10, screenY - 10, paint);
                 canvas.rotate(180, screenX - 10, 10);
-                canvas.drawText("Score: " + " " + Integer.toString(score2), screenX - 10, 10, paint);
+                canvas.drawText(Integer.toString(score2), screenX - 10, 10, paint);
                 //canvas.restore();
 
 
@@ -433,6 +585,7 @@ public class LocalMultiplayer extends Activity {
             e.putInt("score2", score2); // add or overwrite someValue
             e.apply(); // this saves to disk and notifies observers
             startActivity(new Intent(LocalMultiplayer.this, LmGameOver.class));
+            finish();
         }
 
         // If SimpleGameEngine Activity is paused/stopped
@@ -577,13 +730,13 @@ public class LocalMultiplayer extends Activity {
 
 
                         if (touch1Bottom){
-                            paddle1.update(deltaX, screenX);
+                            paddle1.update(deltaX);
                             xVelocity1 = (long) VelocityTrackerCompat.getXVelocity(mVelocityTracker1,
                                     pointerId);
 
                         }
                         else {
-                            paddle2.update(deltaX, screenX);
+                            paddle2.update(deltaX);
                             xVelocity2 = (long) VelocityTrackerCompat.getXVelocity(mVelocityTracker1,
                                     pointerId);
                         }
@@ -610,13 +763,13 @@ public class LocalMultiplayer extends Activity {
 
 
                         if (touch2Bottom){
-                            paddle1.update(deltaX, screenX);
+                            paddle1.update(deltaX);
                             xVelocity1 = (long) VelocityTrackerCompat.getXVelocity(mVelocityTracker2,
                                     pointerId);
 
                         }
                         else {
-                            paddle2.update(deltaX,screenX);
+                            paddle2.update(deltaX);
                             xVelocity2 = (long) VelocityTrackerCompat.getXVelocity(mVelocityTracker2,
                                     pointerId);
                         }
@@ -657,8 +810,16 @@ public class LocalMultiplayer extends Activity {
 
     //Back Button Pressed on device
     @Override
-    public void onBackPressed(){
-        localMultiplayerView.paused=true;
+    public void onBackPressed() {
+        if (localMultiplayerView.paused){
+            startActivity(new Intent(LocalMultiplayer.this, MainMenu.class));
+            finish();
+        }
+        else {
+            localMultiplayerView.paused = true;
+        }
+
+
     }
 }
 
