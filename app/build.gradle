@@ -5,7 +5,7 @@ android {
         config {
             keyAlias 'MyReleaseKey'
             keyPassword 'biascd98'
-            storeFile file('C:/Users/NIck/AndroidStudioProjects/Sprong/Keystore/SprongKeystore.jks')
+            storeFile file('/Users/Nick/AndroidStudioProjects/Sprong/Keystore')//'C:/Users/NIck/AndroidStudioProjects/Sprong/Keystore/SprongKeystore.jks')
             storePassword 'biascd98'
         }
     }

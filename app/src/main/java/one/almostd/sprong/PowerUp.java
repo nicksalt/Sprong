@@ -18,7 +18,7 @@ public class PowerUp {
     private float  y;
     int yVelocity;
     public int paddle;
-    private boolean isVisible = true;
+    private boolean visible = true;
     public boolean isActive;
     private long activateTime;
 
@@ -55,8 +55,8 @@ public class PowerUp {
         return powerUp;
     }
 
-    public boolean getVisibilty(){
-        return isVisible;
+    public boolean isVisible(){
+        return visible;
     }
 
     public float getX(){
@@ -76,7 +76,7 @@ public class PowerUp {
     }
 
     public void invisible(){
-        isVisible = false;
+        visible = false;
     }
 
     public void unactivate(){
