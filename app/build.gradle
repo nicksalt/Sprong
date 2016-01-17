@@ -15,8 +15,8 @@ android {
         applicationId "one.almostd.sprong"
         minSdkVersion 17
         targetSdkVersion 23
-        versionCode 3
-        versionName "1.0"
+        versionCode 4
+        versionName "1.0.4"
     }
     buildTypes {
         release {

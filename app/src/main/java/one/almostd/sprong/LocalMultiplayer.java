@@ -10,17 +10,20 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.VelocityTrackerCompat;
+import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.VelocityTracker;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 
 
 public class LocalMultiplayer extends Activity {
@@ -33,10 +36,12 @@ public class LocalMultiplayer extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //Init localmultiplayerview and set it as the view
         localMultiplayerView = new LocalMultiplayerView(this);
-        setContentView(localMultiplayerView);
+        FrameLayout game = new FrameLayout(this);
+        game.setBackgroundResource(R.drawable.deepfield16x9);
+        game.addView(localMultiplayerView);
+
+        setContentView(game);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
@@ -87,7 +92,7 @@ public class LocalMultiplayer extends Activity {
 
         Bitmap background;
 
-        Bitmap multiball;
+        Bitmap multiBall;
         Bitmap smallPaddle;
         Bitmap largePaddle;
         Bitmap reversePaddle;
@@ -106,13 +111,15 @@ public class LocalMultiplayer extends Activity {
 
         PowerUp[] powerUps = new PowerUp[72];
         int numPowerUps;
+
+        Bullet[] bullets = new Bullet[72*3];
+        int numBullets;
         // The score
         public int score1;
         public int score2;
 
         SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
-        boolean fpsBackground = myPrefs.getBoolean("fpsBackground", true);
-        int fpsLow;
+
         int bricksInvisible;
 
 
@@ -128,6 +135,8 @@ public class LocalMultiplayer extends Activity {
             // Initialize ourHolder and paint objects
             ourHolder = getHolder();
             paint = new Paint();
+            this.setZOrderOnTop(true); //necessary
+            ourHolder.setFormat(PixelFormat.TRANSPARENT);
 
             // Get a Display object to access screen details
             Display display = getWindowManager().getDefaultDisplay();
@@ -154,11 +163,12 @@ public class LocalMultiplayer extends Activity {
 
         public void imageDownloader() {
             background = BitmapFactory.decodeResource(this.getResources(), R.drawable.deepfield16x9);
-            multiball = BitmapFactory.decodeResource(this.getResources(), R.drawable.powerup);
+            multiBall = BitmapFactory.decodeResource(this.getResources(), R.drawable.powerup);
             smallPaddle = BitmapFactory.decodeResource(this.getResources(), R.drawable.smallpaddle);
             largePaddle = BitmapFactory.decodeResource(this.getResources(), R.drawable.largepaddle);
             reversePaddle = BitmapFactory.decodeResource(this.getResources(), R.drawable.reverse);
             bullet = BitmapFactory.decodeResource(this.getResources(), R.drawable.bullet);
+
 
         }
 
@@ -199,20 +209,6 @@ public class LocalMultiplayer extends Activity {
                 // Update the frame
                 if (!paused) {
                     update();
-                    if (fps<18 && fpsBackground){
-                        fpsLow+=1;
-                        if (fpsLow >= 5) {
-                            fpsBackground = false;
-                            SharedPreferences.Editor e = myPrefs.edit();
-                            e.putBoolean("fpsBackground", fpsBackground);
-                            e.apply();
-                            startActivity(new Intent(LocalMultiplayer.this, BackgroundMessage.class));
-                        }
-                    }
-                    else {
-                        fpsLow = 0;
-                    }
-
                 }
                 // Draw the frame
                 draw();
@@ -241,7 +237,7 @@ public class LocalMultiplayer extends Activity {
             ballCollision();
             brickCollision();
             powerUpUpdate();
-
+            bulletsUpdate();
 
             if (numBricks==bricksInvisible){
                 endGame();
@@ -278,7 +274,7 @@ public class LocalMultiplayer extends Activity {
                             bricksInvisible += 1;
                             if (bricks[i].getRandommColour() == 0) {
                                 powerUps[numPowerUps] = new PowerUp(screenY,bricks[i].getRect().left,
-                                        bricks[i].getRect().top, ball.lastPaddleHit, multiball,
+                                        bricks[i].getRect().top, ball.lastPaddleHit, multiBall,
                                         smallPaddle, largePaddle, reversePaddle, bullet);
                                 numPowerUps += 1;
                             }
@@ -303,7 +299,7 @@ public class LocalMultiplayer extends Activity {
                             bricksInvisible += 1;
                             if (bricks[i].getRandommColour() == 0) {
                                 powerUps[numPowerUps] = new PowerUp(screenY, bricks[i].getRect().left,
-                                        bricks[i].getRect().top, ball.lastPaddleHit, multiball,
+                                        bricks[i].getRect().top, ball.lastPaddleHit, multiBall,
                                         smallPaddle, largePaddle, reversePaddle, bullet);
 
                                 numPowerUps += 1;
@@ -354,9 +350,11 @@ public class LocalMultiplayer extends Activity {
                             !RectF.intersects(ball.getRect(), paddle2.getRect())) {
                         ball.reset(screenX, screenY, false);
                         score1 += 10;
+                        if (k > 1) {
+                            ball.isVisible = false;
 
+                        }
                     }
-
                     // If the ball hits left wall bounce
                     if (ball.getRect().left < 0) {
                         ball.reverseXVelocity();
@@ -373,6 +371,7 @@ public class LocalMultiplayer extends Activity {
             }
         }
 
+
         public void powerUpUpdate() {
             for (int i = 0; i < numPowerUps; i++) {
                 PowerUp powerUp = powerUps[i];
@@ -381,85 +380,143 @@ public class LocalMultiplayer extends Activity {
                     if (paddle1.getRect().contains(powerUp.getCenterX(), powerUp.getBottomY())) {
                         powerUp.invisible();
                         powerUp.activate(System.currentTimeMillis());
-                        if (paddle2.getRect().contains(powerUp.getCenterX(), powerUp.getY())) {
-                            powerUp.invisible();
-                            powerUp.activate(System.currentTimeMillis());
-                        }
-                        if (powerUp.getBottomY() > gameBottom) {
-                            powerUp.invisible();
-                        }
-
-                        if (powerUp.getY() < gameTop) {
-                            powerUp.invisible();
-                        }
                     }
+                    if (paddle2.getRect().contains(powerUp.getCenterX(), powerUp.getY())) {
+                        powerUp.invisible();
+                        powerUp.activate(System.currentTimeMillis());
+                    }
+                    if (powerUp.getBottomY() > gameBottom) {
+                        powerUp.invisible();
+                    }
+
+                    if (powerUp.getY() < gameTop) {
+                        powerUp.invisible();
+                    }
+                }
+                if (powerUp.isActive) {
                     activatePowerUp(powerUp);
                 }
             }
         }
         public void activatePowerUp(PowerUp powerUp){
-            if (powerUp.isActive) {
-                long startTime = powerUp.getActivateTime();
-                switch (powerUp.getPowerUpNum()) {
-                    case 1: { //small paddle
-                        if (powerUp.paddle == 1) {
-                            paddle1.setPaddleShrink();
-                            if (System.currentTimeMillis() - startTime >= 5000) {
-                                paddle1.paddleShrinkReset();
-                                powerUp.isActive = false;
-                            }
-                        }
-                        else {
-                            paddle2.setPaddleShrink();
-                            if (System.currentTimeMillis() - startTime >= 5000) {
-                                paddle2.paddleShrinkReset();
-                                powerUp.isActive = false;
-                            }
-                        }
-                        break;
-                    }
-                    case 2: {
-                        if (powerUp.paddle == 1) {
-                            paddle1.setPaddleGrow();
-                            if (System.currentTimeMillis() - startTime >= 5000) {
-                                paddle1.setPaddleGrowReset();
-                                powerUp.isActive = false;
-                            }
-                        } else {
-                            paddle2.setPaddleGrow();
-                            if (System.currentTimeMillis() - startTime >= 5000) {
-                                paddle2.setPaddleGrowReset();
-                                powerUp.isActive = false;
-                            }
-                        }
-                        break;
-                    }
-                    case 3: {
-                        if (powerUp.paddle == 1) {
-                            paddle1.reversePaddle = true;
-                            if (System.currentTimeMillis() - startTime >= 5000) {
-                                paddle1.reversePaddle = false;
-                                powerUp.isActive = false;
-                            }
-                            break;
-                        }
-                        else {
-                            paddle2.reversePaddle = true;
-                            if (System.currentTimeMillis() - startTime >= 5000) {
-                                paddle2.reversePaddle = false;
-                                powerUp.isActive = false;
-                            }
-                            break;
-                        }
-                    }
-                    case 0: {
-                        balls[numBalls] = new Ball(screenX, screenY, powerUp.paddle);
-                        numBalls++;
-                        powerUp.isActive=false;
+            long startTime = powerUp.getActivateTime();
+            switch (powerUp.getPowerUpNum()) {
+                case 0: {
+                    balls[numBalls] = new Ball(screenX, screenY, powerUp.paddle);
+                    numBalls++;
+                    powerUp.unactivate();
+                    powerUp.invisible();
+                    break;
 
+                }
+                case 1: { //small paddle
+                    if (powerUp.paddle == 1) {
+                        paddle1.setPaddleShrink();
+                        if (System.currentTimeMillis() - startTime >= 5000) {
+                            paddle1.paddleShrinkReset();
+                            powerUp.unactivate();
+                            powerUp.invisible();
+                        }
+                    }
+                    else {
+                        paddle2.setPaddleShrink();
+                        if (System.currentTimeMillis() - startTime >= 5000) {
+                            paddle2.paddleShrinkReset();
+                            powerUp.unactivate();
+                            powerUp.invisible();
+                        }
+                    }
+                    break;
+                }
+                case 2: {
+                    if (powerUp.paddle == 1) {
+                        paddle1.setPaddleGrow();
+                        if (System.currentTimeMillis() - startTime >= 5000) {
+                            paddle1.setPaddleGrowReset();
+                            powerUp.unactivate();
+                            powerUp.invisible();
+                        }
+                    } else {
+                        paddle2.setPaddleGrow();
+                        if (System.currentTimeMillis() - startTime >= 5000) {
+                            paddle2.setPaddleGrowReset();
+                            powerUp.unactivate();
+                            powerUp.invisible();
+                        }
+                    }
+                    break;
+                }
+                case 3: {
+                    if (powerUp.paddle == 1) {
+                        paddle1.reversePaddle = true;
+                        if (System.currentTimeMillis() - startTime >= 5000) {
+                            paddle1.reversePaddle = false;
+                            powerUp.unactivate();
+                            powerUp.invisible();
+                        }
+                    }
+                    else {
+                        paddle2.reversePaddle = true;
+                        if (System.currentTimeMillis() - startTime >= 5000) {
+                            paddle2.reversePaddle = false;
+                            powerUp.unactivate();
+                            powerUp.invisible();
+                        }
+                    }
+                    break;
+                }
+
+                case 4: {
+                    float x = powerUp.getX();
+                    float y = powerUp.getY();
+                    if (powerUp.paddle == 1){
+                        Log.d("BULLET", "TEST");
+                        //float y = paddle1.getRect().top + height;
+                        for (int i = 0; i < 5 ; i++){
+                            bullets[numBullets] = new Bullet(screenY, x, y, i, startTime);
+                            numBullets+=1;
+
+                        }
+                    }
+                    else{
+                        //float y = paddle2.getRect().bottom;
+                        for (int i = 0; i < 5 ; i++) {
+                            bullets[numBullets] = new Bullet(screenY, x, y, i, startTime);
+                            numBullets += 1;
+                        }
+                    }
+                    powerUp.unactivate();
+                    powerUp.invisible();
+                    break;
+                }
+            }
+
+        }
+
+        public void bulletsUpdate(){
+            for (int i = 0; i<numBullets; i++) {
+                if (bullets[i].isActive()) {
+                    bullets[i].update(fps);
+                    for (int t = 0; t < numBricks; t++) {
+                        if (bricks[t].getVisibility()) {
+                            if (bricks[t].getRect().contains(bullets[i].getX(), bullets[i].getY())) {
+                                bricks[t].setInvisible();
+                                bullets[i].unactive();
+                                bricksInvisible += 1;
+                                if (bullets[i].up) {
+                                    score1 += 10;
+                                } else {
+                                    score2 += 10;
+                                }
+                            }
+                        }
+                    }
+                    if(bullets[i].getY() > gameBottom || bullets[i].getY() < gameTop){
+                        bullets[i].unactive();
                     }
                 }
             }
+
         }
 
 
@@ -472,17 +529,11 @@ public class LocalMultiplayer extends Activity {
                 // Lock the canvas ready to draw
                 canvas = ourHolder.lockCanvas();
 
-                if (fpsBackground) {
-                    RectF dest = new RectF(0, 0, getWidth(), getHeight());
-                    paint.setFilterBitmap(true);
-                    canvas.drawBitmap(background, null, dest, paint);
-                }
-                else {
-                    canvas.drawColor(Color.BLACK);
-                }
 
+                canvas.drawColor(0, android.graphics.PorterDuff.Mode.CLEAR);
+
+                Log.d("FPS", Long.toString(fps));
                 paint.setColor(Color.BLUE);
-                paint.setTextSize(24);
 
 
                 // Draw the paddle
@@ -511,36 +562,35 @@ public class LocalMultiplayer extends Activity {
                 for (int i = 0; i < numBricks; i++) {
                     if (bricks[i].getVisibility()) {
                         int num = bricks[i].getRandommColour();
-                        switch (num){
-                            case 1:
-                                paint.setColor(Color.BLUE);
-                                break;
-                            case 2:
-                                paint.setColor(Color.GREEN);
-                                break;
-                            case 3:
-                                paint.setColor(Color.MAGENTA);
-                                break;
-                            case 4:
-                                paint.setColor(Color.RED);
-                                break;
-                            case 5:
-                                paint.setColor(getResources().getColor(R.color.orange));
-                                break;
-                            case 6:
-                                paint.setColor(getResources().getColor(R.color.dark_green));
-                                break;
-                            case 7:
-                                paint.setColor(getResources().getColor(R.color.light_blue));
-                                break;
-                            case 8:
-                                paint.setColor(getResources().getColor(R.color.purple));
-                                break;
-                            case 9:
-                                paint.setColor(getResources().getColor(R.color.dark_pink));
-                                break;
-                            default:
-                                paint.setColor(Color.YELLOW);
+                        if (num == 1 || num == 10){
+                            paint.setColor(Color.BLUE);
+                        }
+                        else if (num == 2 || num == 11){
+                            paint.setColor(Color.GREEN);
+                        }
+                        else if (num == 3 || num == 12){
+                            paint.setColor(Color.MAGENTA);
+                        }
+                        else if(num == 4 || num == 13){
+                            paint.setColor(Color.RED);
+                        }
+                        else if (num == 5 ||num == 14){
+                            paint.setColor(getResources().getColor(R.color.orange));
+                        }
+                        else if (num == 6 || num == 15){
+                            paint.setColor(getResources().getColor(R.color.dark_green));
+                        }
+                        else if (num == 7 || num == 16){
+                            paint.setColor(getResources().getColor(R.color.light_blue));
+                        }
+                        else if (num == 8 || num == 17){
+                            paint.setColor(getResources().getColor(R.color.purple));
+                        }
+                        else if (num == 9 || num == 18){
+                            paint.setColor(getResources().getColor(R.color.dark_pink));
+                        }
+                        else{
+                            paint.setColor(Color.YELLOW);
                         }
                         canvas.drawRect(bricks[i].getRect(), paint);
                     }
@@ -549,6 +599,12 @@ public class LocalMultiplayer extends Activity {
                     PowerUp powerUp = powerUps[i];
                     if(powerUp.getVisibilty()) {
                         canvas.drawBitmap(powerUp.getPowerUp(), powerUp.getX(), powerUp.getY(), paint);
+                    }
+                }
+                for (int i = 0; i<numBullets; i++){
+                    if (bullets[i].isActive()) {
+                        canvas.drawBitmap(bullet, bullets[i].getX(),
+                                bullets[i].getY(), paint);
                     }
                 }
                 if (paused){
@@ -583,6 +639,7 @@ public class LocalMultiplayer extends Activity {
             SharedPreferences.Editor e = myPrefs.edit();
             e.putInt("score1", score1); // add or overwrite someValue
             e.putInt("score2", score2); // add or overwrite someValue
+            e.putLong("start", System.currentTimeMillis());
             e.apply(); // this saves to disk and notifies observers
             startActivity(new Intent(LocalMultiplayer.this, LmGameOver.class));
             finish();

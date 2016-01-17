@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -20,11 +21,14 @@ public class LmGameOver extends Activity {
     int numRoundsWon2;
     int numRounds;
 
+    long end;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lm_game_over);
         myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        long start = myPrefs.getLong("start", System.currentTimeMillis());
+        end = System.currentTimeMillis();
         TextView ScoreOne =(TextView) findViewById(R.id.Score1);
         TextView ScoreTwo =(TextView) findViewById(R.id.Score2);
         TextView rounds1 = (TextView) findViewById(R.id.RoundsWon1);
@@ -48,47 +52,50 @@ public class LmGameOver extends Activity {
         mInterstitialAd.setAdListener(new AdListener() {
             public void onAdLoaded() {
                 mInterstitialAd.show();
-                newGame.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View v) {
-                        SharedPreferences.Editor e = myPrefs.edit();
-                        e.putInt("roundsWon1", 0);
-                        e.putInt("roundsWon2", 0);
-                        e.putInt("numRounds", 1);
-                        e.apply();
-                        // Perform action on click
-                        startActivity(new Intent(LmGameOver.this, LocalMultiplayer.class));
 
-                        finish();
-                    }
-                });
-                mainMenu.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View v) {
-                        // Perform action on click
-                        SharedPreferences.Editor e = myPrefs.edit();
-                        e.putInt("roundsWon1", 0);
-                        e.putInt("roundsWon2", 0);
-                        e.putInt("numRounds", 1);
-                        e.apply();
-                        startActivity(new Intent(LmGameOver.this, MainMenu.class));
-                        finish();
-                    }
-                });
-                nextGame.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View v) {
-                        SharedPreferences.Editor e = myPrefs.edit();
-                        e.putInt("roundsWon1", numRoundsWon1);
-                        e.putInt("roundsWon2", numRoundsWon2);
-                        e.putInt("numRounds", numRounds+1);
-                        e.apply();
-                        // Perform action on click
-                        startActivity(new Intent(LmGameOver.this, LocalMultiplayer.class));
-                        finish();
-                    }
-                });
+            }
+        });
+
+        newGame.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                SharedPreferences.Editor e = myPrefs.edit();
+                e.putInt("roundsWon1", 0);
+                e.putInt("roundsWon2", 0);
+                e.putInt("numRounds", 1);
+                e.apply();
+                // Perform action on click
+                startActivity(new Intent(LmGameOver.this, LocalMultiplayer.class));
+
+                finish();
+            }
+        });
+        mainMenu.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Perform action on click
+                SharedPreferences.Editor e = myPrefs.edit();
+                e.putInt("roundsWon1", 0);
+                e.putInt("roundsWon2", 0);
+                e.putInt("numRounds", 1);
+                e.apply();
+                startActivity(new Intent(LmGameOver.this, MainMenu.class));
+                finish();
+            }
+        });
+        nextGame.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                SharedPreferences.Editor e = myPrefs.edit();
+                e.putInt("roundsWon1", numRoundsWon1);
+                e.putInt("roundsWon2", numRoundsWon2);
+                e.putInt("numRounds", numRounds+1);
+                e.apply();
+                // Perform action on click
+                startActivity(new Intent(LmGameOver.this, LocalMultiplayer.class));
+                finish();
             }
         });
 
 
+        Log.d("Time", "l");
 
         ScoreOne.setText(Integer.toString(score1));
         ScoreTwo.setText(Integer.toString(score2));

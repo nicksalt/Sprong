@@ -1,6 +1,7 @@
 package one.almostd.sprong;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import java.util.Random;
 
@@ -18,10 +19,10 @@ public class PowerUp {
     int yVelocity;
     public int paddle;
     private boolean isVisible = true;
-    public boolean isActive = false;
+    public boolean isActive;
     private long activateTime;
 
-    public PowerUp (int screenY, float xOfBrick, float yOfBrick, int paddleHit, Bitmap multiball,
+    public PowerUp (int screenY, float xOfBrick, float yOfBrick, int paddleHit, Bitmap multiBall,
                     Bitmap smallPaddle, Bitmap largePaddle, Bitmap reversePaddle, Bitmap bullet) {
         x = xOfBrick;
         y = yOfBrick;
@@ -44,9 +45,10 @@ public class PowerUp {
                 powerUp = bullet;
                 break;
             default:
-                powerUp = multiball;
+                powerUp = multiBall;
                 break;
         }
+        Log.d("Powerup num =", Integer.toString(powerUpNum));
     }
 
     public Bitmap getPowerUp (){
@@ -75,6 +77,10 @@ public class PowerUp {
 
     public void invisible(){
         isVisible = false;
+    }
+
+    public void unactivate(){
+        isActive = false;
     }
 
     public void activate (long startTime){

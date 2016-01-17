@@ -24,7 +24,7 @@ public class Brick {
                 row * height + padding,
                 column * width + width - padding,
                 row * height + height - padding);
-        randomColour = r.nextInt(10);
+        randomColour = r.nextInt(19);
     }
 
     public RectF getRect(){
