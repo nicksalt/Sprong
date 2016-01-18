@@ -29,7 +29,7 @@ public class MainMenu extends Activity {
         playButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Perform action on click
-                startActivity(new Intent(MainMenu.this, LocalMultiplayer.class));
+                startActivity(new Intent(MainMenu.this, GameSelection.class));
             }
         });
 

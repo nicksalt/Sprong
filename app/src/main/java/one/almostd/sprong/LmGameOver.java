@@ -20,6 +20,7 @@ public class LmGameOver extends Activity {
     int numRoundsWon1;
     int numRoundsWon2;
     int numRounds;
+    boolean singleplayer;
 
     long end;
     @Override
@@ -27,7 +28,7 @@ public class LmGameOver extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lm_game_over);
         myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
-        long start = myPrefs.getLong("start", System.currentTimeMillis());
+        singleplayer = myPrefs.getBoolean("singleplayer", true);
         end = System.currentTimeMillis();
         TextView ScoreOne =(TextView) findViewById(R.id.Score1);
         TextView ScoreTwo =(TextView) findViewById(R.id.Score2);
@@ -64,7 +65,13 @@ public class LmGameOver extends Activity {
                 e.putInt("numRounds", 1);
                 e.apply();
                 // Perform action on click
-                startActivity(new Intent(LmGameOver.this, LocalMultiplayer.class));
+                if (singleplayer){
+                    startActivity(new Intent(LmGameOver.this, SinglePlayer.class));
+                }
+                else{
+                    startActivity(new Intent(LmGameOver.this, SinglePlayer.class));
+                }
+
 
                 finish();
             }
@@ -89,7 +96,12 @@ public class LmGameOver extends Activity {
                 e.putInt("numRounds", numRounds+1);
                 e.apply();
                 // Perform action on click
-                startActivity(new Intent(LmGameOver.this, LocalMultiplayer.class));
+                if (singleplayer){
+                    startActivity(new Intent(LmGameOver.this, SinglePlayer.class));
+                }
+                else{
+                    startActivity(new Intent(LmGameOver.this, SinglePlayer.class));
+                }
                 finish();
             }
         });
