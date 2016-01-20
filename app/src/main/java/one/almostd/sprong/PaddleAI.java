@@ -1,6 +1,8 @@
 package one.almostd.sprong;
 
+import android.content.SharedPreferences;
 import android.graphics.RectF;
+import android.util.Log;
 
 /**
  * Created by Nick on 2016-01-18.
@@ -16,14 +18,18 @@ public class PaddleAI {
     int screenY;
     float xVelocity;
     public boolean reversePaddle;
+    float paddleSpeed;
+
+    SharedPreferences myPrefs;
     //X is the far left of the rectangle which forms our paddle
     public float x;
 
-    public PaddleAI(int screenWidth, int screenHeight, int y){
+    public PaddleAI(int screenWidth, int screenHeight, int y, int difficulty){
         screenX = screenWidth;
         screenY = screenHeight;
 
-        xVelocity = screenWidth;
+        xVelocity = screenWidth * difficulty;
+        Log.d("difficulty", Integer.toString(difficulty));
         length = (float)(screenX/4.25);
         height = screenY/50;
 
@@ -69,11 +75,15 @@ public class PaddleAI {
         if(rect.right < x) {
             rect.left = rect.left + xVelocity / fps;
             rect.right = rect.left + length;
+            paddleSpeed= xVelocity;
         }
         if (rect.left > x){
             rect.left = rect.left - xVelocity / fps;
             rect.right = rect.left + length;
-
+            paddleSpeed = -xVelocity;
+        }
+        else {
+            paddleSpeed = 0;
         }
         if (rect.left < 0 ){
             rect.left=0;

@@ -343,7 +343,7 @@ public class LocalMultiplayer extends Activity {
                     if (ball.getRect().bottom > gameBottom &&
                             !RectF.intersects(paddle1.getRect(), ball.getRect())) {
                         ball.reset(screenX, screenY, true);
-                        score2 += 10;
+                        score2 += 20;
                         if (k > 1) {
                             ball.isVisible = false;
                         }
@@ -354,7 +354,7 @@ public class LocalMultiplayer extends Activity {
                     if (ball.getRect().top < gameTop &&
                             !RectF.intersects(ball.getRect(), paddle2.getRect())) {
                         ball.reset(screenX, screenY, false);
-                        score1 += 10;
+                        score1 += 20;
                         if (k > 1) {
                             ball.isVisible = false;
 

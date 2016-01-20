@@ -26,40 +26,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#FFFF"
-        android:background="@drawable/button_border"
-        android:textSize="50sp"
-        android:text="NEW GAME"
-        android:id="@+id/NewGame"
-        android:layout_marginBottom="70dp"
-        android:layout_above="@+id/Score1"
-        android:layout_centerHorizontal="true" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#FFFF"
-        android:background="@drawable/button_border"
-        android:textSize="50sp"
-        android:text="MAIN MENU"
-        android:id="@+id/MainMenu"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#FFFF"
-        android:background="@drawable/button_border"
-        android:textSize="50sp"
-        android:text="NEXT GAME"
-        android:id="@+id/NextGame"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="70dp"
-        android:layout_below="@+id/Score2" />
 
     <TextView
         android:id="@+id/Score1"
@@ -107,6 +74,44 @@
         android:id="@+id/RoundsWon2"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerInParent="true">
+        <Button
+            android:layout_width="match_parent"
+            android:layout_margin="8dp"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFF"
+            android:background="@drawable/button_border"
+            android:textSize="50sp"
+            android:text="PLAY AGAIN"
+            android:id="@+id/NextGame"/>
+
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:textColor="#FFFF"
+            android:background="@drawable/button_border"
+            android:textSize="50sp"
+            android:text="MAIN MENU"
+            android:id="@+id/MainMenu"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:textColor="#FFFF"
+            android:background="@drawable/button_border"
+            android:textSize="50sp"
+            android:text="NEW GAME"
+            android:id="@+id/NewGame" />
+
+    </LinearLayout>
 
 
 </RelativeLayout>

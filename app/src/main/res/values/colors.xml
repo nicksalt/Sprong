@@ -10,6 +10,8 @@
     <color name="light_blue">#00FFFF</color>
     <color name="purple">#9A2EFE</color>
     <color name="dark_pink">#DF0174</color>
+    <color name="red">#FF0000 </color>
+    <color name="yellow">#FFFF00</color>
     <color name="st_theresa_blue">#13233F</color>
     <color name="st_theresa_burgundy">#82054D</color>
 </resources>

@@ -82,7 +82,6 @@ SinglePlayerView singleplayerview;
         private float mLastTouchX;
         VelocityTracker mVelocityTracker1 = null;
         long xVelocity1;
-        long xVelocity2;
 
         // The players paddles
         Paddle paddle1;
@@ -115,7 +114,7 @@ SinglePlayerView singleplayerview;
         public int score2;
 
         SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);//Used to save variables
-
+        int difficulty = myPrefs.getInt("speedAI", 1);
         // When the we initializer
         public SinglePlayerView(Context context) {
             // The next line of code asks the
@@ -142,7 +141,7 @@ SinglePlayerView singleplayerview;
 
             //Paddles
             paddle1 = new Paddle(screenX, screenY, gameBottom, true);
-            paddle2 = new PaddleAI(screenX, screenY, gameTop);
+            paddle2 = new PaddleAI(screenX, screenY, gameTop, difficulty);
 
             imageDownloader();
             createBricksAndRestart();
@@ -234,15 +233,17 @@ SinglePlayerView singleplayerview;
                     if (balls[i].getRect().centerY() < balls[ballY].getRect().centerY()) {
                         ballY = i;
                     }
-                    if (i + 1 == numBalls) {
-                        paddle2.update(balls[ballY].getRect().centerX(), fps);
-                    }
                 }
+                if (i + 1 == numBalls && balls[ballY].getRect().top < screenY / difficulty) {
+                    paddle2.update(balls[ballY].getRect().centerX(), fps);
+                }
+
+
             }
 
             // Check for ball collisons, call individual update methods
-            ballCollision();
             brickCollision();
+            ballCollision();
             powerUpUpdate();
             bulletsUpdate();
 
@@ -329,11 +330,12 @@ SinglePlayerView singleplayerview;
                         ball.lastPaddleHit = 1;
                         ball.xVelocity += (xVelocity1 / 15);
                     }
-                    // Check for ball colliding with paddle 1
+                    // Check for ball colliding with paddle 2
                     if (RectF.intersects(paddle2.getRect(), ball.getRect())) {
                         ball.reverseYVelocity();
                         ball.clearObstacleY(paddle2.getRect().bottom + ball.ballHeight);
                         ball.lastPaddleHit = 2;
+                        ball.xVelocity += (paddle2.paddleSpeed / 8);
                 }
 
 
@@ -341,7 +343,7 @@ SinglePlayerView singleplayerview;
                     if (ball.getRect().bottom > gameBottom &&
                             !RectF.intersects(paddle1.getRect(), ball.getRect())) {
                         ball.reset(screenX, screenY, true);
-                        score2 += 10;
+                        score2 += 20;
                         if (k > 1) {
                             ball.isVisible = false;
                             if (k == ballY){
@@ -355,7 +357,7 @@ SinglePlayerView singleplayerview;
                     if (ball.getRect().top < gameTop &&
                             !RectF.intersects(ball.getRect(), paddle2.getRect())) {
                         ball.reset(screenX, screenY, false);
-                        score1 += 10;
+                        score1 += 20;
                         if (k > 1) {
                             ball.isVisible = false;
                             if (k == ballY){
@@ -709,6 +711,7 @@ SinglePlayerView singleplayerview;
 
                 case MotionEvent.ACTION_UP: {
                     primaryPointer = INVALID_POINTER_ID;
+                    xVelocity1=0;
                     break;
                 }
 

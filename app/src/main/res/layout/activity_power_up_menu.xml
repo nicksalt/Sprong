@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/deepfield16x9"
+    tools:context="one.almostd.sprong.PowerUpMenu">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Power Ups"
+        android:textStyle="bold"
+        android:textColor="@color/red"
+        android:background="@drawable/button_border_black"
+        android:id="@+id/PowerUpHome"
+        android:textAlignment="center"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:background="@drawable/button_border_black"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/yellow_brick"
+        android:textColor="@color/yellow"
+        android:id="@+id/YellowBrick"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:layout_marginTop="25dp"
+        android:layout_below="@+id/PowerUpHome"
+        android:layout_centerHorizontal="true" />
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/powerUpAd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        ads:adSize="SMART_BANNER"
+        ads:adUnitId="@string/power_up_menu_ad">
+    </com.google.android.gms.ads.AdView>
+
+</RelativeLayout>

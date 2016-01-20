@@ -21,10 +21,6 @@
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" />
         <activity
-            android:name=".BackgroundMessage"
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" />
-        <activity
             android:name=".Controls"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" />
@@ -45,7 +41,14 @@
             android:name=".GameSelection"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" />
-
+        <activity
+            android:name=".DifficultySelection"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" />
+        <activity
+            android:name=".PowerUpMenu"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen" />
     </application>
 
 </manifest>

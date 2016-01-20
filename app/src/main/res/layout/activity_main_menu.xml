@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:ads="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/deepfield16x9"
     android:layout_width="match_parent"
@@ -18,6 +17,13 @@
         ads:adUnitId="@string/main_menu_bottom_ad_unit_id">
     </com.google.android.gms.ads.AdView>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/menuBottomAdView"
+        android:id="@+id/relativeLayout">
+
+    </RelativeLayout>
 
     <Button
         android:id="@+id/PlayButton"
@@ -30,37 +36,39 @@
 
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+
         android:background="@drawable/button_border"
-        android:layout_marginTop="52dp"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
-    <Button
-        android:id="@+id/Controls"
-
-        android:text="CONTROLS"
-
-        android:textColor="#FFFF"
-        android:textSize="50sp"
-
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/button_border"
-        android:layout_centerVertical="true"
-        android:layout_alignEnd="@+id/PlayButton" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="25dp" />
 
     <Button
         android:id="@+id/Credits"
 
         android:text="CREDITS"
         android:textColor="#FFFF"
-        android:textSize="50sp"
+        android:textSize="45sp"
 
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/button_border"
-        android:layout_marginBottom="34dp"
         android:layout_above="@+id/menuBottomAdView"
-        android:layout_centerHorizontal="true" />
-    </RelativeLayout>
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="25dp" />
+
+    <Button
+        android:id="@+id/Controls"
+
+        android:text="HOW TO PLAY"
+
+        android:textColor="#FFFF"
+        android:textSize="45sp"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_border"
+        android:layout_centerInParent="true" />
+
+</RelativeLayout>
 
 

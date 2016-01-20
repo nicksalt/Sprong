@@ -65,12 +65,8 @@ public class LmGameOver extends Activity {
                 e.putInt("numRounds", 1);
                 e.apply();
                 // Perform action on click
-                if (singleplayer){
-                    startActivity(new Intent(LmGameOver.this, SinglePlayer.class));
-                }
-                else{
-                    startActivity(new Intent(LmGameOver.this, SinglePlayer.class));
-                }
+                startActivity(new Intent(LmGameOver.this, GameSelection.class));
+
 
 
                 finish();
@@ -100,7 +96,7 @@ public class LmGameOver extends Activity {
                     startActivity(new Intent(LmGameOver.this, SinglePlayer.class));
                 }
                 else{
-                    startActivity(new Intent(LmGameOver.this, SinglePlayer.class));
+                    startActivity(new Intent(LmGameOver.this, LocalMultiplayer.class));
                 }
                 finish();
             }

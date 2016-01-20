@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/deepfield16x9"
+    android:orientation="vertical">
+    <Button
+        android:id="@+id/Easy"
+
+        android:text="EASY"
+        android:textStyle="bold"
+        android:textColor="#FFFF"
+        android:textSize="60sp"
+        android:background="@drawable/button_border"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="8dp"
+        android:layout_weight="1"/>
+
+
+
+
+    <Button
+        android:id="@+id/Medium"
+
+        android:text="MEDIUM"
+        android:textStyle="bold"
+        android:textColor="#FFFF"
+        android:textSize="60sp"
+        android:background="@drawable/button_border"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="8dp"
+        android:layout_weight="1" />
+
+    <Button
+        android:id="@+id/Hard"
+
+        android:text="HARD"
+        android:textStyle="bold"
+        android:textColor="#FFFF"
+        android:textSize="60sp"
+        android:background="@drawable/button_border"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="8dp"
+        android:layout_weight="1" />
+
+    <Button
+        android:id="@+id/Extreme"
+
+        android:text="EXTREME"
+        android:textStyle="bold"
+        android:textColor="#FFFF"
+        android:textSize="60sp"
+        android:background="@drawable/button_border"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="8dp"
+        android:layout_weight="1" />
+
+
+</LinearLayout>
