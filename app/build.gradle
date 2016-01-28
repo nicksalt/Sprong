@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-
+//I can change build type, version code/number, min android version, target version, etc.
 android {
     signingConfigs {
         config {
@@ -15,8 +15,8 @@ android {
         applicationId "one.almostd.sprong"
         minSdkVersion 17
         targetSdkVersion 23
-        versionCode 5
-        versionName "1.0.5"
+        versionCode 6
+        versionName "1.0"
     }
     buildTypes {
         release {

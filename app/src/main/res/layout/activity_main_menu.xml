@@ -7,7 +7,7 @@
     android:layout_height="match_parent">
 
 
-    <com.google.android.gms.ads.AdView
+    <!--<com.google.android.gms.ads.AdView
         android:id="@+id/menuBottomAdView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -15,59 +15,64 @@
         android:layout_alignParentBottom="true"
         ads:adSize="SMART_BANNER"
         ads:adUnitId="@string/main_menu_bottom_ad_unit_id">
-    </com.google.android.gms.ads.AdView>
+    </com.google.android.gms.ads.AdView>-->
+
+    <com.ytnspob.reotzuf275124.AdView
+        xmlns:ap="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/menuBottomAdView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_above="@+id/menuBottomAdView"
         android:id="@+id/relativeLayout">
 
+        <Button
+            android:id="@+id/PlayButton"
+            android:text="PLAY"
+            android:textStyle="bold"
+            android:textColor="#FFFF"
+            android:textSize="80sp"
+            android:layout_margin="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_border"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="25dp" />
+
+        <Button
+            android:id="@+id/Controls"
+            android:text="HOW TO PLAY"
+            android:textColor="#FFFF"
+            android:textSize="45sp"
+            android:layout_margin="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_border"
+            android:layout_centerInParent="true" />
+
+        <Button
+            android:id="@+id/Credits"
+            android:text="CREDITS"
+            android:textColor="#FFFF"
+            android:textSize="45sp"
+            android:layout_margin="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_border"
+            android:layout_marginBottom="25dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true" />
+
     </RelativeLayout>
 
-    <Button
-        android:id="@+id/PlayButton"
 
-        android:text="PLAY"
-        android:textStyle="bold"
 
-        android:textColor="#FFFF"
-        android:textSize="100sp"
-
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        android:background="@drawable/button_border"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="25dp" />
-
-    <Button
-        android:id="@+id/Credits"
-
-        android:text="CREDITS"
-        android:textColor="#FFFF"
-        android:textSize="45sp"
-
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/button_border"
-        android:layout_above="@+id/menuBottomAdView"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="25dp" />
-
-    <Button
-        android:id="@+id/Controls"
-
-        android:text="HOW TO PLAY"
-
-        android:textColor="#FFFF"
-        android:textSize="45sp"
-
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/button_border"
-        android:layout_centerInParent="true" />
 
 </RelativeLayout>
 

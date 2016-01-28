@@ -1,8 +1,6 @@
 package one.almostd.sprong;
 
-import android.content.SharedPreferences;
 import android.graphics.RectF;
-import android.util.Log;
 
 /**
  * Created by Nick on 2016-01-18.
@@ -20,7 +18,6 @@ public class PaddleAI {
     public boolean reversePaddle;
     float paddleSpeed;
 
-    SharedPreferences myPrefs;
     //X is the far left of the rectangle which forms our paddle
     public float x;
 
@@ -29,7 +26,6 @@ public class PaddleAI {
         screenY = screenHeight;
 
         xVelocity = screenWidth * difficulty;
-        Log.d("difficulty", Integer.toString(difficulty));
         length = (float)(screenX/4.25);
         height = screenY/50;
 

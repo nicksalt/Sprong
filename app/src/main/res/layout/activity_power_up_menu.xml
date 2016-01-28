@@ -24,16 +24,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textStyle="bold"
-        android:background="@drawable/button_border_black"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="@string/yellow_brick"
         android:textColor="@color/yellow"
         android:id="@+id/YellowBrick"
         android:textAlignment="center"
         android:textSize="20sp"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="19dp"
         android:layout_below="@+id/PowerUpHome"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignParentStart="true" />
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/powerUpAd"
@@ -44,5 +43,201 @@
         ads:adSize="SMART_BANNER"
         ads:adUnitId="@string/power_up_menu_ad">
     </com.google.android.gms.ads.AdView>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="MAIN MENU"
+        android:background="@drawable/button_border_black"
+        android:textColor="#FFFF"
+        android:id="@+id/MainMenuPowerUp"
+        android:layout_above="@+id/powerUpAd"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="25dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/MainMenuPowerUp"
+        android:layout_below="@+id/YellowBrick">
+
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical"
+            android:gravity="center">
+            <View
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+
+            </View>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/smallpaddlelarge"
+                android:id="@+id/SmallPaddle" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+
+            </View>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/largepaddlelarge"
+                android:id="@+id/LargePaddle"/>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+
+            </View>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/poweruplarge"
+                android:id="@+id/MultiBall"/>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+
+            </View>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bulletlarge"
+                android:id="@+id/Bullet"/>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+
+            </View>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/reverselarge"
+                android:id="@+id/Reverse"/>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+
+            </View>
+
+        </LinearLayout>
+        <!-- Right side spacer -->
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical"
+            android:gravity="center">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+
+            </View>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/SmallPaddleText"
+                android:textAlignment="center"
+                android:textColor="#FFFF"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:text="Makes your paddle smaller for 5 seconds."/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+
+            </View>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:textStyle="bold"
+                android:id="@+id/LargePaddleText"
+                android:textColor="#FFFF"
+                android:textSize="15sp"
+                android:text="Makes your paddle larger for 5 seconds."/>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+
+            </View>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/MultiBallText"
+                android:textColor="#FFFF"
+                android:textSize="17sp"
+                android:text="Adds an extra ball."
+                android:textStyle="bold"/>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+
+            </View>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/BulletText"
+                android:textColor="#FFFF"
+                android:textSize="17sp"
+                android:text="Shoots five bullets."
+                android:textStyle="bold"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+
+            </View>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/ReverseText"
+                android:textColor="#FFFF"
+                android:textSize="15sp"
+                android:textAlignment="center"
+                android:text="Reverses paddle movement for five seconds."
+                android:textStyle="bold"/>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+
+            </View>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
 
 </RelativeLayout>

@@ -46,7 +46,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="NEXT"
-        android:background="@drawable/button_border"
+        android:background="@drawable/button_border_black"
         android:textColor="#FFFF"
         android:id="@+id/Next"
         android:layout_above="@+id/controlsAdView"

@@ -7,6 +7,7 @@ import android.graphics.RectF;
  * Created by Nick on 2015-12-01.
  */
 public class Ball {
+    //Initialize variables
     RectF rect;
     float xVelocity;
     float yVelocity;
@@ -19,9 +20,11 @@ public class Ball {
 
 
     public Ball(int screenX, int screenY, int player){
+        //All values like the ones below I've come up with from extensive testing
         ballWidth = screenX/22;
         ballHeight = screenX/22;
         x = screenX/2 - (ballWidth / 2) ;
+        //One ball  starts at the bottom, the other the top
         if (player == 1) {
             y = (float) (screenY - screenY / 4.5);
             xVelocity = (int) (screenX/7.2);
@@ -32,14 +35,8 @@ public class Ball {
             xVelocity = - (int) (screenX/7.2);
             yVelocity = (float) (- screenY/3.2);
         }
+        //You can draw a rectangle as a circle, android does not have built in circle object
         rect = new RectF(x , y, x + ballWidth, y + ballHeight);
-        // Start the ball travelling straight up at 100 pixels per second
-
-
-        // Place the ball in the centre of the screen at the bottom
-
-
-
     }
 
     public RectF getRect(){
@@ -61,13 +58,12 @@ public class Ball {
         xVelocity = - xVelocity;
     }
 
-
-
     public void clearObstacleY(float y){
         rect.bottom = y;
         rect.top = rect.bottom - ballHeight;
     }
 
+    //Used when ball hits side of screen, just makes it look cleaner.
     public void clearObstacleX(float x){
         rect.left = x;
         rect.right = rect.left + ballWidth;

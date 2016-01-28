@@ -17,7 +17,6 @@ import android.os.Bundle;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.VelocityTrackerCompat;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -28,7 +27,7 @@ import android.widget.FrameLayout;
 
 
 public class LocalMultiplayer extends Activity {
-    /*Holds logic of the local multiplayer - like a motherboard of computer
+    /*Holds logic of the local multiplayer
     Will also respond to screen touches
     */
     LocalMultiplayerView localMultiplayerView;
@@ -277,7 +276,7 @@ public class LocalMultiplayer extends Activity {
                                     break;
                             }
                             bricksInvisible += 1;
-                            if (bricks[i].getRandommColour() == 0) {//The brick is yelow & yellow bricks are powerups
+                            if (bricks[i].getRandomColour() == 0) {//The brick is yelow & yellow bricks are powerups
                                 powerUps[numPowerUps] = new PowerUp(screenY,bricks[i].getRect().left,
                                         bricks[i].getRect().top, ball.lastPaddleHit, multiBall,
                                         smallPaddle, largePaddle, reversePaddle, bullet);
@@ -302,7 +301,7 @@ public class LocalMultiplayer extends Activity {
                                     break;
                             }
                             bricksInvisible += 1;
-                            if (bricks[i].getRandommColour() == 0) {
+                            if (bricks[i].getRandomColour() == 0) {
                                 powerUps[numPowerUps] = new PowerUp(screenY, bricks[i].getRect().left,
                                         bricks[i].getRect().top, ball.lastPaddleHit, multiBall,
                                         smallPaddle, largePaddle, reversePaddle, bullet);
@@ -504,7 +503,7 @@ public class LocalMultiplayer extends Activity {
                         if (bricks[t].getVisibility()) {
                             if (bricks[t].getRect().contains(bullets[i].getX(), bullets[i].getY())) {
                                 bricks[t].setInvisible();
-                                bullets[i].unactive();
+                                bullets[i].unActive();
                                 bricksInvisible += 1;
                                 if (bullets[i].up) {
                                     score1 += 10;
@@ -515,7 +514,7 @@ public class LocalMultiplayer extends Activity {
                         }
                     }
                     if(bullets[i].getY() > gameBottom || bullets[i].getY() < gameTop){
-                        bullets[i].unactive();
+                        bullets[i].unActive();
                     }
                 }
             }
@@ -580,11 +579,11 @@ public class LocalMultiplayer extends Activity {
             }
         }
 
-        @SuppressWarnings("deprecation")
+        @SuppressWarnings("deprecation")//OVerrides deprecatiated code
         public void drawBricks(Canvas canvas, Paint paint){
             for (int i = 0; i < numBricks; i++) {
                 if (bricks[i].getVisibility()) {
-                    int num = bricks[i].getRandommColour();
+                    int num = bricks[i].getRandomColour();
                     if (num == 1 || num == 10){
                         paint.setColor(Color.BLUE);
                     }
@@ -663,11 +662,11 @@ public class LocalMultiplayer extends Activity {
 
         }
 
-        // If SimpleGameEngine Activity is started theb
-        // start our thread.
+        //Called when activity is resumed.
         public void resume() {
 
             playing = true;
+            //Start new thread.
             gameThread = new Thread(this);
             gameThread.start();
 
@@ -682,11 +681,15 @@ public class LocalMultiplayer extends Activity {
 
 
         @Override
+        //Build in android class
         public boolean onTouchEvent(MotionEvent e) {
+            /*Following two lines let me know if it is the first, second, third... pointer on the screen
+            pointers are saved in array so first pointerId = 0, second = 1, etc.
+             */
             int index = MotionEventCompat.getActionIndex(e);
             int pointerId = MotionEventCompat.getPointerId(e, index);
             switch (MotionEventCompat.getActionMasked(e)) {
-
+                //This is called when the FIRST pointer touches the screen
                 case MotionEvent.ACTION_DOWN: {
                     paused=false;
                     // Remember where we started (for dragging)
@@ -705,12 +708,13 @@ public class LocalMultiplayer extends Activity {
                     mVelocityTracker1.addMovement(e);
                     break;
                 }
-
+                //This is called when any other pointer after the first hits the screen.
                 case MotionEvent.ACTION_POINTER_DOWN: {
                     if (pointerId == 0) {
                         // Remember where we started (for dragging)
                         mLastTouchX1 = MotionEventCompat.getX(e, index);
                         primaryPointer = pointerId;
+                        //Check to see what paddle user is controlling
                         touch1Bottom = MotionEventCompat.getY(e, index) > screenY / 2;
                         if(mVelocityTracker1 == null) {
                             // Retrieve a new VelocityTracker object to watch the velocity of a motion.
@@ -729,6 +733,7 @@ public class LocalMultiplayer extends Activity {
                         // Remember where we started (for dragging)
                         mLastTouchX2 = MotionEventCompat.getX(e, index);
                         secondPointer = pointerId;
+                        //Check to see what paddle user is controlling
                         touch2Bottom = MotionEventCompat.getY(e, index) > screenY / 2;
                         if(mVelocityTracker2 == null) {
                             // Retrieve a new VelocityTracker object to watch the velocity of a motion.
@@ -743,9 +748,14 @@ public class LocalMultiplayer extends Activity {
                     }
                     break;
                 }
+                /*When LAST pointer hits the screen, not when first pointer leaves the screen
+                  The difference between the two is important and it took me awhile to figure it out
+                 */
                 case MotionEvent.ACTION_UP: {
                     if (pointerId == 0) {
+                        //Set xvelocity to 0, user has to move paddle to spin ball
                         xVelocity1=0;
+
                         primaryPointer = INVALID_POINTER_ID;
                     }
                     if (pointerId == 1){
@@ -756,12 +766,7 @@ public class LocalMultiplayer extends Activity {
 
                     break;
                 }
-
-                case MotionEvent.ACTION_CANCEL: {
-
-                    break;
-                }
-
+                //Any other pointer before the last leaves the screen
                 case MotionEvent.ACTION_POINTER_UP: {
                     if (pointerId == 0) {
                         xVelocity1=0;
@@ -773,25 +778,15 @@ public class LocalMultiplayer extends Activity {
                     }
                     break;
                 }
+                //Important one, when any pointer moves.
                 case MotionEvent.ACTION_MOVE: {
                     if (primaryPointer == 0) {
                         float x = MotionEventCompat.getX(e, primaryPointer);
                         float deltaX = x - mLastTouchX1;
                         mVelocityTracker1.addMovement(e);
-                        // When you want to determine the velocity, call
-                        // computeCurrentVelocity(). Then call getXVelocity()
-                        // and getYVelocity() to retrieve the velocity for each pointer ID.
                         mVelocityTracker1.computeCurrentVelocity(1000);
-                        // Log velocity of pixels per second
-                        // Best practice to use VelocityTrackerCompat where possible.
-                        /*Log.d("123", "X velocity: " +
-                                VelocityTrackerCompat.getXVelocity(mVelocityTracker1,
-                                        pointerId));
-                        Log.d("345", "Y velocity: " +
-                                VelocityTrackerCompat.getYVelocity(mVelocityTracker1,
-                                        pointerId));*/
-
-
+                        //I can now call x velocity as pixel per second
+                        //Check to see if it is for top or bottom paddle
                         if (touch1Bottom){
                             paddle1.update(deltaX);
                             xVelocity1 = (long) VelocityTrackerCompat.getXVelocity(mVelocityTracker1,
@@ -805,26 +800,13 @@ public class LocalMultiplayer extends Activity {
                         }
                         mLastTouchX1 = x;
                     }
-
+                    //THe following is almost the same as the top, just for the other pointer
                     if (secondPointer == 1) {
                         final int pointerIndex = MotionEventCompat.findPointerIndex(e, secondPointer);
                         float x = MotionEventCompat.getX(e, pointerIndex);
                         float deltaX = x - mLastTouchX2;
                         mVelocityTracker2.addMovement(e);
-                        // When you want to determine the velocity, call
-                        // computeCurrentVelocity(). Then call getXVelocity()
-                        // and getYVelocity() to retrieve the velocity for each pointer ID.
                         mVelocityTracker2.computeCurrentVelocity(1000);
-                        // Log velocity of pixels per second
-                        // Best practice to use VelocityTrackerCompat where possible.
-                        /*Log.d("", "X velocity: " +
-                                VelocityTrackerCompat.getXVelocity(mVelocityTracker2,
-                                        pointerId));
-                        Log.d("", "Y velocity: " +
-                                VelocityTrackerCompat.getYVelocity(mVelocityTracker2,
-                                        pointerId));*/
-
-
                         if (touch2Bottom){
                             paddle1.update(deltaX);
                             xVelocity1 = (long) VelocityTrackerCompat.getXVelocity(mVelocityTracker2,
@@ -847,7 +829,6 @@ public class LocalMultiplayer extends Activity {
             return true;
         }
     }
-    // This is the end of our BreakoutView inner class
 
     // This method executes when the player starts the game
     @Override
@@ -857,11 +838,9 @@ public class LocalMultiplayer extends Activity {
         // Tell the gameView resume method to execute
         localMultiplayerView.resume();
     }
-    // Everything that needs to be updated goes in here
-    // Movement, collision detection etc.
 
 
-    // This method executes when the player quits the game
+    // This method executes when the player quits the game, hits home button, multitask button, etc.
     @Override
     protected void onPause() {
         super.onPause();
@@ -874,21 +853,18 @@ public class LocalMultiplayer extends Activity {
     //Back Button Pressed on device
     @Override
     public void onBackPressed() {
+        //If the game is already paused return to main menu
         if (localMultiplayerView.paused){
             startActivity(new Intent(LocalMultiplayer.this, MainMenu.class));
             finish();
         }
+        //If game is not paused pause it
         else {
             localMultiplayerView.paused = true;
         }
-
-
+        //This allows users to double tap back button to return to main menu.
     }
 }
 
-
-// This is the end of the BreakoutGame class
-
-// This is the end of the BreakoutGame class
 
 

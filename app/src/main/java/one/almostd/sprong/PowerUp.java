@@ -1,7 +1,6 @@
 package one.almostd.sprong;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 
 import java.util.Random;
 
@@ -9,7 +8,9 @@ import java.util.Random;
  * Created by Nick on 2016-01-10.
  */
 public class PowerUp {
-
+    /*I like to use private variables to make sure I dont mess anything up in other classes.
+      By making variables private, then with a corresponding method I make sure I actually am sure to call it
+     */
     private Bitmap powerUp;
 
     Random r = new Random();
@@ -28,7 +29,7 @@ public class PowerUp {
         y = yOfBrick;
         yVelocity = (int)(screenY / 3.2);
         paddle = paddleHit;
-
+        //Randome powerup.
         powerUpNum = r.nextInt(5);
 
         switch (powerUpNum) {
@@ -48,9 +49,8 @@ public class PowerUp {
                 powerUp = multiBall;
                 break;
         }
-        Log.d("Powerup num =", Integer.toString(powerUpNum));
     }
-
+    //Methods for public variables
     public Bitmap getPowerUp (){
         return powerUp;
     }
@@ -91,12 +91,12 @@ public class PowerUp {
     public int getPowerUpNum(){
         return powerUpNum;
     }
-
+    //Last for 5 seconds so I save the activated time
     public long getActivateTime(){
         return activateTime;
     }
 
-
+    //If paddle 1 it goes down, if paddle to it goes up.
     public void update (long fps){
         if (paddle == 1){
             y = (y + (yVelocity / fps));

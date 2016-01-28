@@ -6,11 +6,11 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="main_menu_bottom_ad_unit_id">ca-app-pub-6595053800412592/7154562867</string>
-    <string name="main_menu_top_ad_unit_id">ca-app-pub-6595053800412592/1517034864</string>
     <string name="controls_ad_unit_id">ca-app-pub-6595053800412592/6240429267</string>
     <string name="nicks_phone_id">02157df28d874504</string>
     <string name="game_over_ad_unit_id">ca-app-pub-6595053800412592/7739012062</string>
     <string name="power_up_menu_ad">ca-app-pub-6595053800412592/1517034864</string>
+    <string name="credits_ad_unit_id">ca-app-pub-6595053800412592/8322357264</string>
     <string name="yellow_brick">Hitting a yellow brick will result in a power up!</string>
 
     <string name="title_activity_single_player">SinglePlayer</string>

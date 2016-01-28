@@ -26,7 +26,7 @@ import android.widget.FrameLayout;
 
 
 public class SinglePlayer extends Activity {
-
+//THis is almost the same as LmGameOver class, just calls different paddle and no need for multi touch.
 SinglePlayerView singleplayerview;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -277,7 +277,7 @@ SinglePlayerView singleplayerview;
                                     break;
                             }
                             bricksInvisible += 1;
-                            if (bricks[i].getRandommColour() == 0) {//The brick is yelow & yellow bricks are powerups
+                            if (bricks[i].getRandomColour() == 0) {//The brick is yelow & yellow bricks are powerups
                                 powerUps[numPowerUps] = new PowerUp(screenY,bricks[i].getRect().left,
                                         bricks[i].getRect().top, ball.lastPaddleHit, multiBall,
                                         smallPaddle, largePaddle, reversePaddle, bullet);
@@ -302,7 +302,7 @@ SinglePlayerView singleplayerview;
                                     break;
                             }
                             bricksInvisible += 1;
-                            if (bricks[i].getRandommColour() == 0) {
+                            if (bricks[i].getRandomColour() == 0) {
                                 powerUps[numPowerUps] = new PowerUp(screenY, bricks[i].getRect().left,
                                         bricks[i].getRect().top, ball.lastPaddleHit, multiBall,
                                         smallPaddle, largePaddle, reversePaddle, bullet);
@@ -510,7 +510,7 @@ SinglePlayerView singleplayerview;
                         if (bricks[t].getVisibility()) {
                             if (bricks[t].getRect().contains(bullets[i].getX(), bullets[i].getY())) {
                                 bricks[t].setInvisible();
-                                bullets[i].unactive();
+                                bullets[i].unActive();
                                 bricksInvisible += 1;
                                 if (bullets[i].up) {
                                     score1 += 10;
@@ -521,7 +521,7 @@ SinglePlayerView singleplayerview;
                         }
                     }
                     if(bullets[i].getY() > gameBottom || bullets[i].getY() < gameTop){
-                        bullets[i].unactive();
+                        bullets[i].unActive();
                     }
                 }
             }
@@ -586,11 +586,11 @@ SinglePlayerView singleplayerview;
             }
         }
 
-        @SuppressWarnings("deprecation")
+        @SuppressWarnings("deprecation")//Oveerrides deprecatiated methods
         public void drawBricks(Canvas canvas, Paint paint){
             for (int i = 0; i < numBricks; i++) {
                 if (bricks[i].getVisibility()) {
-                    int num = bricks[i].getRandommColour();
+                    int num = bricks[i].getRandomColour();
                     if (num == 1 || num == 10){
                         paint.setColor(Color.BLUE);
                     }
@@ -685,6 +685,7 @@ SinglePlayerView singleplayerview;
 
 
         @Override
+        //Shorter than LMGameOver, no need for multitouch
         public boolean onTouchEvent(MotionEvent e) {
             int index = MotionEventCompat.getActionIndex(e);
             int pointerId = MotionEventCompat.getPointerId(e, index);
@@ -715,44 +716,24 @@ SinglePlayerView singleplayerview;
                     break;
                 }
 
-                case MotionEvent.ACTION_CANCEL: {
-                    break;
-                }
-
-
                 case MotionEvent.ACTION_MOVE: {
                     if (primaryPointer == 0) {
                         float x = MotionEventCompat.getX(e, primaryPointer);
                         float deltaX = x - mLastTouchX;
                         mVelocityTracker1.addMovement(e);
-                        // When you want to determine the velocity, call
-                        // computeCurrentVelocity(). Then call getXVelocity()
-                        // and getYVelocity() to retrieve the velocity for each pointer ID.
                         mVelocityTracker1.computeCurrentVelocity(1000);
-                        // Log velocity of pixels per second
-                        // Best practice to use VelocityTrackerCompat where possible.
-                        /*Log.d("123", "X velocity: " +
-                                VelocityTrackerCompat.getXVelocity(mVelocityTracker1,
-                                        pointerId));
-                        Log.d("345", "Y velocity: " +
-                                VelocityTrackerCompat.getYVelocity(mVelocityTracker1,
-                                        pointerId));*/
-
                         paddle1.update(deltaX);
                         xVelocity1 = (long) VelocityTrackerCompat.getXVelocity(mVelocityTracker1,
                                     pointerId);
 
                         mLastTouchX = x;
                     }
-
                     break;
                 }
-
             }
             return true;
         }
     }
-    // This is the end of our BreakoutView inner class
 
     // This method executes when the player starts the game
     @Override
@@ -762,9 +743,6 @@ SinglePlayerView singleplayerview;
         // Tell the gameView resume method to execute
         singleplayerview.resume();
     }
-    // Everything that needs to be updated goes in here
-    // Movement, collision detection etc.
-
 
     // This method executes when the player quits the game
     @Override
@@ -790,8 +768,3 @@ SinglePlayerView singleplayerview;
 
     }
 }
-
-
-// This is the end of the BreakoutGame class
-
-// This is the end of the BreakoutGame class
