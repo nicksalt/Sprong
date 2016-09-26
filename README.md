@@ -1,2 +1,3 @@
-# Sprong-Andriod
-Sprong is a mobile game application developed as a school project by Cameron Bardell, Nick Salt, and Jared McGrath. The iOS version is developed and maintained by Cameron and Jared, while the Android version is developed and maintained by Nick.
+Sprong is a game that I and a few classmates developed for our grade twelve computer science final. We were given free range on what we would like to work on, so we decided to make a mobile game. The game has been downloaded dozens of times on both the iOS App Store and the Google Play Store. I worked on the Android version of the game independently, and this is the source code.
+
+The source code was once affilated with the organization "Almost Done Games".
